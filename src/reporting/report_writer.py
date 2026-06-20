@@ -1,0 +1,52 @@
+"""Result consolidation and export."""
+
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Any
+
+import pandas as pd
+
+from src.utils.metrics import format_metric
+
+
+class ReportWriter:
+    @staticmethod
+    def make_row(
+        modelo: str,
+        rewiring: str,
+        result: dict[str, Any],
+    ) -> dict[str, Any]:
+
+        acc = result["acc_summary"]
+        f1 = result["f1_summary"]
+        loss = result["loss_summary"]
+        return {
+            "Modelo": modelo,
+            "Rewiring": rewiring,
+            "acc_mean": acc["mean"],
+            "acc_std": acc["std"],
+            "acc_ci95": acc["ci95"],
+            "f1_mean": f1["mean"],
+            "f1_std": f1["std"],
+            "f1_ci95": f1["ci95"],
+            "loss_mean": loss["mean"],
+            "loss_std": loss["std"],
+            "loss_ci95": loss["ci95"],
+            "Test_Acc": format_metric(acc["mean"], acc["std"], acc["ci95"]),
+            "Test_F1_Macro": format_metric(f1["mean"], f1["std"], f1["ci95"]),
+            "Train_Loss": format_metric(loss["mean"], loss["std"], loss["ci95"]),
+            "elapsed_seconds": result["elapsed_seconds"],
+        }
+
+    @staticmethod
+    def export(
+        rows: list[dict[str, Any]], csv_path: Path, md_path: Path | None = None
+    ) -> pd.DataFrame:
+        csv_path.parent.mkdir(parents=True, exist_ok=True)
+        df = pd.DataFrame(rows)
+        df.to_csv(csv_path, index=False)
+        if md_path is not None:
+            md_path.parent.mkdir(parents=True, exist_ok=True)
+            df.to_markdown(md_path, index=False)
+        return df
