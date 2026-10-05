@@ -1,0 +1,10 @@
+{
+  "profile": "recovery_smoke",
+  "configurations": 3,
+  "independent_graph_instances": 3,
+  "feature_label_tasks": 3,
+  "nested_pipeline_runs": 3,
+  "gnn_conditions_per_nested_run": 12,
+  "estimated_gnn_fits": 36,
+  "scientific_unit_for_indicator": "independent_graph_instance"
+}

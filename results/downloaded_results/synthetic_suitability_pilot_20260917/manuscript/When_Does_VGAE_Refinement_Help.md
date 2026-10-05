@@ -1,0 +1,3 @@
+## When Does VGAE Refinement Help
+
+We decomposed the total effect into a geometric reconstruction gain and an additional VGAE-refinement gain. For every nested run, the geometric contribution was defined as the test macro-F1 of learned Delaunay minus the original-graph score. The refinement contribution was defined as the test macro-F1 of the validation-selected positive refinement rate minus learned Delaunay at zero percent refinement. This decomposition prevents improvements caused by the geometric scaffold from being attributed to VGAE. A second indicator was fitted using only prerewiring structural metrics and was frozen independently of the real datasets.

@@ -1,0 +1,113 @@
+{
+  "independent_graphs": 205,
+  "configurations": 41,
+  "families": 6,
+  "nested_runs": 2460,
+  "conditions": 24600,
+  "selected_rewiring": {
+    "n": 205,
+    "mean": -0.043790937487951265,
+    "median": -0.0434186164444192,
+    "q025": -0.1126610064147768,
+    "q975": 0.030100437393622097,
+    "positive_fraction": 0.06341463414634146,
+    "success_0_5pp_fraction": 0.05365853658536585,
+    "success_1_0pp_fraction": 0.05365853658536585,
+    "wilcoxon_statistic": 684.0,
+    "wilcoxon_p_two_sided": 3.6511941210374215e-31,
+    "configuration_bootstrap_mean_ci95": [
+      -0.05246395648022726,
+      -0.03511632639551425
+    ]
+  },
+  "geometry_only": {
+    "n": 205,
+    "mean": -0.09138967387833077,
+    "median": -0.0908240619509056,
+    "q025": -0.1982177313606138,
+    "q975": 0.005590422519800789,
+    "positive_fraction": 0.02926829268292683,
+    "success_0_5pp_fraction": 0.02926829268292683,
+    "success_1_0pp_fraction": 0.024390243902439025,
+    "wilcoxon_statistic": 66.0,
+    "wilcoxon_p_two_sided": 5.720530709935927e-35,
+    "configuration_bootstrap_mean_ci95": [
+      -0.1049007541438297,
+      -0.07817818566155726
+    ]
+  },
+  "vgae_increment": {
+    "n": 205,
+    "mean": 0.04907054847645725,
+    "median": 0.0468027112221135,
+    "q025": -0.004123707584098229,
+    "q975": 0.10518936513934565,
+    "positive_fraction": 0.9609756097560975,
+    "success_0_5pp_fraction": 0.9560975609756097,
+    "success_1_0pp_fraction": 0.9365853658536586,
+    "wilcoxon_statistic": 101.0,
+    "wilcoxon_p_two_sided": 9.52831885676305e-35,
+    "configuration_bootstrap_mean_ci95": [
+      0.04219870133522539,
+      0.05632557279082
+    ]
+  },
+  "selected_ratio_counts": {
+    "0.0": 539,
+    "0.1": 387,
+    "0.25": 471,
+    "0.4": 472,
+    "0.55": 591
+  },
+  "baseline_gain_spearman": 0.015079646060868679,
+  "gain_regression": [
+    {
+      "model": "ridge",
+      "mae": 0.0285410922808064,
+      "rmse": 0.0381989151016311,
+      "r2": -0.3233325140558256,
+      "spearman": 0.2066582162109456
+    },
+    {
+      "model": "random_forest_exploratory",
+      "mae": 0.0247057216211041,
+      "rmse": 0.0320107178771725,
+      "r2": 0.0706961130471078,
+      "spearman": 0.3978311554783238
+    }
+  ],
+  "external_validation": {
+    "datasets": 12,
+    "observed_successes_0_5pp": 6,
+    "recommended": 0,
+    "uncertain": 0,
+    "avoided": 12,
+    "synthetic_feature_ranges": {
+      "lambda2_norm_laplacian": [
+        0.0023254177275161,
+        0.5494154022773008
+      ],
+      "density": [
+        0.0165969316596931,
+        0.0647140864714086
+      ]
+    },
+    "real_feature_ranges": {
+      "lambda2_norm_laplacian": [
+        2.554538381278837e-08,
+        0.2372644227309343
+      ],
+      "density": [
+        0.0001282344913036,
+        0.1177921315325895
+      ]
+    },
+    "real_datasets_inside_both_synthetic_ranges": 3
+  },
+  "integrity": {
+    "selected_unique_run_ids": 2460,
+    "expected_conditions_per_run": 10,
+    "missing_test_f1": 0,
+    "duplicate_selected_run_ids": 0
+  }
+}

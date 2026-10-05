@@ -1,0 +1,5 @@
+start_timestamp=2026-09-18T11:56:17+00:00
+protocol=frozen_predictions_before_outcomes
+workers=3
+success_definition=mean selected rewiring gain greater than 0.5 pp
+Python 3.10.14

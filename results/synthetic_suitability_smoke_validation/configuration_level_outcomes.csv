@@ -1,0 +1,2 @@
+family,configuration_id,gain_selected_rewiring_mean,gain_selected_rewiring_std,gain_selected_rewiring_count,gain_geometry_mean,gain_geometry_std,gain_geometry_count,gain_vgae_mean,gain_vgae_std,gain_vgae_count,positive_run_fraction_mean,positive_run_fraction_std,positive_run_fraction_count
+sbm_density_matched,sbm_density_matched__c1fea0fe6e,-0.0535714285714284,,1,-0.2186643078283945,,1,0.165092879256966,,1,0.0,,1

@@ -1,0 +1,42 @@
+{
+  "wave": "blind_wave2_degree_corrected",
+  "prediction_file_sha256": "c8dc188cb4b392cd1a64a4ce0b152e764253f106b7e3fb63127c6d1053764136",
+  "features": [
+    "lambda2_norm_laplacian",
+    "algebraic_connectivity",
+    "density",
+    "avg_degree",
+    "degree_cv",
+    "avg_clustering",
+    "transitivity",
+    "degree_assortativity",
+    "approx_avg_shortest_path",
+    "approx_diameter",
+    "num_components",
+    "largest_cc_ratio",
+    "num_isolates",
+    "effective_resistance_sample",
+    "edge_connectivity_ratio",
+    "spectral_sweep_conductance",
+    "modularity"
+  ],
+  "success_definition": "mean selected gain > 0.5 pp",
+  "knowledge_class_balance": {
+    "0": 143,
+    "1": 69
+  },
+  "knowledge_group_cv": {
+    "n": 212,
+    "accuracy": 0.5,
+    "balanced_accuracy": 0.5243741765480896,
+    "roc_auc": 0.5391709739535827,
+    "brier_score": 0.24769299641953096,
+    "precision": 0.3445378151260504,
+    "recall_sensitivity": 0.5942028985507246,
+    "specificity": 0.45454545454545453,
+    "tn": 65,
+    "fp": 78,
+    "fn": 28,
+    "tp": 41
+  }
+}

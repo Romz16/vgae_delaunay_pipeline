@@ -1,3 +1,5 @@
+"""Optuna optimization for VGAE embeddings."""
+
 from __future__ import annotations
 
 import copy
@@ -16,14 +18,27 @@ LOGGER = logging.getLogger("vgae_delaunay_pipeline.vgae_optimizer")
 
 
 class VGAEOptimizer:
+    """Optimize VGAE hyperparameters using link-prediction validation."""
 
     def __init__(self, config: PipelineConfig, device: torch.device) -> None:
+        """Initialize the optimizer.
 
+        Args:
+            config: Global pipeline configuration.
+            device: Target device.
+        """
         self.config = config
         self.device = device
 
     def optimize(self, data: Data) -> VGAEParams:
+        """Run Optuna and return the best VGAE parameters.
 
+        Args:
+            data: Input graph.
+
+        Returns:
+            Best VGAE hyperparameters found by Optuna.
+        """
         LOGGER.info("Iniciando busca de hiperparâmetros para VGAE...")
         sampler = optuna.samplers.TPESampler(
             seed=self.config.base_seed,
@@ -32,9 +47,7 @@ class VGAEOptimizer:
         pruner = optuna.pruners.MedianPruner(
             n_warmup_steps=self.config.optuna.pruning_warmup_steps,
         )
-        study = optuna.create_study(
-            direction="maximize", sampler=sampler, pruner=pruner
-        )
+        study = optuna.create_study(direction="maximize", sampler=sampler, pruner=pruner)
         study.optimize(
             lambda trial: self._objective(trial, data),
             n_trials=self.config.optuna.vgae_trials,
@@ -48,12 +61,8 @@ class VGAEOptimizer:
     def _objective(self, trial: optuna.Trial, data: Data) -> float:
         """Optuna objective using validation AUC/AP."""
         params = VGAEParams(
-            hidden_channels=trial.suggest_categorical(
-                "hidden_channels", [32, 64, 128, 256]
-            ),
-            latent_channels=trial.suggest_categorical(
-                "latent_channels", [16, 32, 64, 128]
-            ),
+            hidden_channels=trial.suggest_categorical("hidden_channels", [32, 64, 128, 256]),
+            latent_channels=trial.suggest_categorical("latent_channels", [16, 32, 64, 128]),
             lr=trial.suggest_float("lr", 1e-4, 1e-2, log=True),
             weight_decay=trial.suggest_float("weight_decay", 1e-7, 1e-3, log=True),
             dropout=trial.suggest_float("dropout", 0.0, 0.7),
@@ -66,14 +75,15 @@ class VGAEOptimizer:
             split_labels=True,
             add_negative_train_samples=False,
         )
-        train_data, val_data, _ = split_transform(copy.copy(data.detach().cpu()))
+        # PyG's ``Data.cpu()`` mutates the object in place.  Clone first so an
+        # Optuna trial cannot move the pipeline's shared graph off CUDA.
+        split_data = copy.deepcopy(data).detach().cpu()
+        train_data, val_data, _ = split_transform(split_data)
         train_data = train_data.to(self.device)
         val_data = val_data.to(self.device)
 
         model = build_vgae(int(data.num_features), params, self.device)
-        optimizer = torch.optim.Adam(
-            model.parameters(), lr=params.lr, weight_decay=params.weight_decay
-        )
+        optimizer = torch.optim.Adam(model.parameters(), lr=params.lr, weight_decay=params.weight_decay)
 
         for epoch in range(1, self.config.training.vgae_opt_epochs + 1):
             model.train()
@@ -101,14 +111,12 @@ class VGAEOptimizer:
         model.eval()
         with torch.no_grad():
             z = model.encode(train_data.x, train_data.edge_index)
-            auc, ap = model.test(
-                z, val_data.pos_edge_label_index, val_data.neg_edge_label_index
-            )
+            auc, ap = model.test(z, val_data.pos_edge_label_index, val_data.neg_edge_label_index)
         return float((auc + ap) / 2.0)
 
     @staticmethod
     def _params_from_trial_dict(params: dict[str, object]) -> VGAEParams:
-
+        """Convert Optuna params into a typed dataclass."""
         return VGAEParams(
             hidden_channels=int(params["hidden_channels"]),
             latent_channels=int(params["latent_channels"]),

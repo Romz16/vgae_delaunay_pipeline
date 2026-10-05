@@ -1,0 +1,162 @@
+{
+  "graph": {
+    "ba_attachment": [
+      2,
+      4,
+      8
+    ],
+    "bottleneck_edge_counts": [
+      2,
+      4,
+      12,
+      32
+    ],
+    "community_counts": [
+      2,
+      4
+    ],
+    "corruption_levels": [
+      0.0,
+      0.5
+    ],
+    "corruption_modes": [
+      "degree_preserving",
+      "homophily_attack"
+    ],
+    "ensure_connected": false,
+    "families": [
+      "latent_corruption_recovery"
+    ],
+    "instances_per_configuration": 1,
+    "latent_homophily_levels": [
+      0.5
+    ],
+    "max_generation_attempts": 20,
+    "node_counts": [
+      90
+    ],
+    "sbm_mixing": [
+      0.03,
+      0.1,
+      0.25,
+      0.45
+    ],
+    "target_avg_degrees": [
+      6
+    ],
+    "ws_rewire_probabilities": [
+      0.0,
+      0.05,
+      0.2,
+      0.6,
+      1.0
+    ]
+  },
+  "indicator": {
+    "bootstrap_repetitions": 50,
+    "candidate_features": [
+      "lambda2_norm_laplacian",
+      "algebraic_connectivity",
+      "density",
+      "avg_degree",
+      "degree_cv",
+      "avg_clustering",
+      "transitivity",
+      "degree_assortativity",
+      "approx_avg_shortest_path",
+      "approx_diameter",
+      "num_components",
+      "largest_cc_ratio",
+      "num_isolates",
+      "effective_resistance_sample",
+      "edge_connectivity",
+      "edge_connectivity_ratio",
+      "spectral_sweep_conductance",
+      "modularity"
+    ],
+    "external_compatible_features": [
+      "lambda2_norm_laplacian",
+      "density",
+      "avg_degree",
+      "degree_cv",
+      "approx_avg_shortest_path",
+      "approx_diameter",
+      "num_components",
+      "largest_cc_ratio",
+      "num_isolates",
+      "effective_resistance_sample"
+    ],
+    "false_negative_cost": 1.0,
+    "false_positive_cost": 3.0,
+    "leave_one_family_out": true,
+    "max_tree_depth": 3,
+    "min_leaf_graphs": 2,
+    "outer_grouping": "configuration_id",
+    "primary_success_threshold_pp": 0.5,
+    "random_state": 7301,
+    "success_thresholds_pp": [
+      0.0,
+      0.5,
+      1.0
+    ],
+    "uncertain_margin": 0.12
+  },
+  "master_seed": 20260916,
+  "metrics": {
+    "bfs_sources": 32,
+    "exact_edge_connectivity_max_nodes": 500,
+    "modularity_max_nodes": 3000,
+    "resistance_pairs": 12,
+    "spectral_tolerance": 0.0001
+  },
+  "output_dir": "outputs_revision\\corruption_recovery_smoke",
+  "pipeline": {
+    "auxiliary_epochs": 8,
+    "constructors": [
+      "delaunay",
+      "raw_umap_delaunay",
+      "knn",
+      "mutual_knn",
+      "mst_knn",
+      "learned_hd_knn",
+      "raw_hd_knn",
+      "delaunay_union_original",
+      "random_edge_budget_matched",
+      "random_degree_matched"
+    ],
+    "downstream_backbone": "gcn",
+    "downstream_epochs": 12,
+    "dropout": 0.35,
+    "hidden_channels": 16,
+    "latent_channels": 8,
+    "learning_rate": 0.005,
+    "pipeline_seed_start": 41000,
+    "pipeline_seeds_per_task": 1,
+    "refine_controls": false,
+    "rewiring_ratios": [
+      0.0,
+      0.25
+    ],
+    "selection_metric": "f1",
+    "vgae_epochs": 10,
+    "weight_decay": 0.0005
+  },
+  "profile": "recovery_smoke",
+  "task": {
+    "class_signal": {
+      "informative": 1.5,
+      "noisy": 0.15,
+      "partial": 0.75
+    },
+    "feature_dimensions": 12,
+    "feature_noise_std": 1.0,
+    "feature_regimes": [
+      "partial"
+    ],
+    "label_regimes": [
+      "structural"
+    ],
+    "min_class_size": 5,
+    "task_seeds_per_graph": 1
+  }
+}

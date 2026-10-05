@@ -1,0 +1,2 @@
+family,configuration_id,gain_selected_rewiring_mean,gain_selected_rewiring_std,gain_selected_rewiring_count,gain_geometry_mean,gain_geometry_std,gain_geometry_count,gain_vgae_mean,gain_vgae_std,gain_vgae_count,positive_run_fraction_mean,positive_run_fraction_std,positive_run_fraction_count
+latent_corruption_recovery,latent_corruption_recovery__0333cc83d7,0.1558441558441558,,1,0.1558441558441558,,1,0.0390913434391695,,1,1.0,,1

@@ -22,6 +22,9 @@ ENV/
 # Experiment artifacts and downloaded datasets
 /data/
 /outputs/
+# Curated research artifacts under results/ are intentionally versioned.
+!results/
+!results/**
 *.npy
 *.npz
 *.pt

@@ -1,3 +1,5 @@
+"""Training utilities for VGAE embedding extraction."""
+
 from __future__ import annotations
 
 import numpy as np
@@ -11,9 +13,14 @@ from src.utils.seed import set_seed
 
 
 class VGAETrainer:
+    """Train VGAE models and extract latent embeddings."""
 
     def __init__(self, device: torch.device) -> None:
+        """Initialize the trainer.
 
+        Args:
+            device: Target PyTorch device.
+        """
         self.device = device
 
     def train(
@@ -24,7 +31,18 @@ class VGAETrainer:
         seed: int,
         edge_index: torch.Tensor | None = None,
     ) -> VGAE:
+        """Train a VGAE model.
 
+        Args:
+            data: Input graph.
+            params: VGAE hyperparameters.
+            epochs: Number of training epochs.
+            seed: Random seed.
+            edge_index: Optional edge index. Defaults to ``data.edge_index``.
+
+        Returns:
+            Trained VGAE model.
+        """
         set_seed(seed)
         graph_edges = (edge_index if edge_index is not None else data.edge_index).to(self.device)
         model = build_vgae(int(data.num_features), params, self.device)
@@ -33,14 +51,6 @@ class VGAETrainer:
         for _ in range(1, epochs + 1):
             model.train()
             optimizer.zero_grad(set_to_none=True)
-
-
-            # PATCH_DEVICE_SYNC_VGAE
-            target_device = getattr(self, "device", next(model.parameters()).device)
-            model = model.to(target_device)
-            data = data.to(target_device)
-            graph_edges = graph_edges.to(target_device)
-
             z = model.encode(data.x, graph_edges)
             loss = model.recon_loss(z, graph_edges)
             loss = loss + (1.0 / data.num_nodes) * model.kl_loss()
@@ -51,14 +61,17 @@ class VGAETrainer:
 
     @torch.no_grad()
     def extract_embeddings(self, model: VGAE, data: Data, edge_index: torch.Tensor | None = None) -> np.ndarray:
+        """Extract VGAE latent embeddings from a trained model.
 
+        Args:
+            model: Trained VGAE model.
+            data: Input graph.
+            edge_index: Optional edge index. Defaults to ``data.edge_index``.
+
+        Returns:
+            NumPy array with shape [num_nodes, latent_channels].
+        """
         model.eval()
         graph_edges = (edge_index if edge_index is not None else data.edge_index).to(self.device)
-
-        # PATCH_DEVICE_SYNC_VGAE_EXTRACT
-        target_device = getattr(self, "device", next(model.parameters()).device)
-        model = model.to(target_device)
-        data = data.to(target_device)
-        graph_edges = graph_edges.to(target_device)
         z = model.encode(data.x, graph_edges)
         return z.detach().cpu().numpy().astype(np.float32, copy=False)

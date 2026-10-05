@@ -53,132 +53,56 @@ class GraphLoader:
     def load_from_name(self, name: str) -> Data:
         """Load a supported PyG dataset by name.
 
-        Supported names/aliases include:
-            - Cora, Pubmed, Citeseer
-            - Cornell, Texas, Wisconsin
-            - Actor
-            - WikiCS
-            - LastFMAsia
-            - Flickr
-            - Chameleon, Squirrel, Crocodile
-            - Airports-Brazil, Airports-USA, Airports-Europe
-            - Amazon-Photo, Amazon Photo, AmazonPhoto, Photo, Amazon
-            - Amazon-Computers
-            - Roman-Empire, Minesweeper, Tolokers, Questions, Amazon-Ratings
-
         Args:
-            name: Dataset identifier.
+            name: Dataset identifier, such as ``Cora``, ``Wisconsin``,
+                ``LastFMAsia``, ``Roman-empire`` or ``Airports-Brazil``.
 
         Returns:
             Normalized PyG graph.
         """
-        raw_name = name.strip()
-        key = raw_name.lower().replace("_", "-").replace(" ", "-")
+        key = name.lower().replace("_", "-")
         transform = NormalizeFeatures()
 
         if key in {"cora", "pubmed", "citeseer"}:
-            canonical = {
-                "cora": "Cora",
-                "pubmed": "PubMed",
-                "citeseer": "CiteSeer",
-            }[key]
-            dataset = Planetoid(
-                root=str(self.root / "Planetoid"),
-                name=canonical,
-                transform=transform,
-            )
-
+            canonical_name = {"cora": "Cora", "pubmed": "PubMed", "citeseer": "CiteSeer"}[key]
+            dataset = Planetoid(root=str(self.root / "Planetoid"), name=canonical_name, transform=transform)
         elif key in {"cornell", "texas", "wisconsin"}:
-            canonical = {
-                "cornell": "Cornell",
-                "texas": "Texas",
-                "wisconsin": "Wisconsin",
-            }[key]
-            dataset = WebKB(
-                root=str(self.root / "WebKB"),
-                name=canonical,
-                transform=transform,
-            )
-
+            dataset = WebKB(root=str(self.root / "WebKB"), name=name.capitalize(), transform=transform)
         elif key in {"actor"}:
             dataset = Actor(root=str(self.root / "Actor"), transform=transform)
-
-        elif key in {"wikics", "wiki-cs", "wiki-cs-dataset"}:
+        elif key in {"wikics", "wiki-cs"}:
             dataset = WikiCS(root=str(self.root / "WikiCS"), transform=transform)
-
-        elif key in {"lastfmasia", "lastfm-asia", "lastfm"}:
+        elif key in {"lastfmasia", "lastfm-asia"}:
             dataset = LastFMAsia(root=str(self.root / "LastFMAsia"), transform=transform)
-
         elif key in {"flickr"}:
             dataset = Flickr(root=str(self.root / "Flickr"), transform=transform)
-
         elif key in {"chameleon", "squirrel", "crocodile"}:
             dataset = WikipediaNetwork(
                 root=str(self.root / "WikipediaNetwork"),
                 name=key,
                 transform=transform,
             )
-
-        elif key in {"airports-brazil", "airport-brazil", "airport-br", "airports-br", "brazil", "brasil", "airports-brasil"}:
+        elif key in {"airports-brazil", "airport-br", "brazil", "airports-br"}:
             dataset = Airports(root=str(self.root / "Airports"), name="Brazil", transform=transform)
-
-        elif key in {"airports-usa", "airport-usa", "airports-us", "airport-us", "usa", "us"}:
+        elif key in {"airports-usa", "usa", "airports-us"}:
             dataset = Airports(root=str(self.root / "Airports"), name="USA", transform=transform)
-
-        elif key in {"airports-europe", "airport-europe", "europe", "eu"}:
+        elif key in {"airports-europe", "europe"}:
             dataset = Airports(root=str(self.root / "Airports"), name="Europe", transform=transform)
-
-        # Amazon do PyG. Para o seu experimento, use Amazon-Photo.
-        # Também deixei "Amazon" como alias de Amazon-Photo para evitar o erro anterior.
-        elif key in {"amazon", "amazon-photo", "amazonphoto", "amazon-photos", "photo", "photos"}:
-            dataset = Amazon(
-                root=str(self.root / "Amazon"),
-                name="Photo",
-                transform=transform,
-            )
-
-        elif key in {"amazon-computers", "amazon-computer", "amazoncomputers", "computers", "computer"}:
-            dataset = Amazon(
-                root=str(self.root / "Amazon"),
-                name="Computers",
-                transform=transform,
-            )
-
-        elif key in {"roman-empire", "romanempire", "minesweeper", "tolokers", "questions", "amazon-ratings", "amazon-ratings-dataset"}:
+        elif key in {"amazon-computers", "amazon-photo"}:
+            amazon_name = "Computers" if "computers" in key else "Photo"
+            dataset = Amazon(root=str(self.root / "Amazon"), name=amazon_name, transform=transform)
+        elif key in {"coauthor-cs", "coauthorcs", "coauthor"}:
+            dataset = Coauthor(root=str(self.root / "coauthor"), name="CS", transform=transform)
+        elif key in {"roman-empire", "amazon-ratings", "minesweeper", "tolokers", "questions"}:
             if HeterophilousGraphDataset is None:
                 raise ImportError("Sua versão do PyG não possui HeterophilousGraphDataset.")
-
-            canonical = {
-                "romanempire": "roman-empire",
-                "amazon-ratings-dataset": "amazon-ratings",
-            }.get(key, key)
-
             dataset = HeterophilousGraphDataset(
                 root=str(self.root / "HeterophilousGraphDataset"),
-                name=canonical,
+                name=key,
                 transform=transform,
             )
-
-        elif key in {"author", "coauthor", "co-author", "coauthor-cs", "coauthor_cs", "coauthorcs", "author-cs", "cs"}:
-            dataset = Coauthor(
-                root=str(self.root / "Author"),
-                name="CS",
-                transform=transform,
-            )
-
-        elif key in {"coauthor-physics", "coauthor_physics", "physics", "author-physics"}:
-            dataset = Coauthor(
-                root=str(self.root / "CoauthorPhysics"),
-                name="Physics",
-                transform=transform,
-            )
-
         else:
-            raise ValueError(
-                f"Dataset PyG não suportado: {name}. "
-                "Use, por exemplo: Cora, Pubmed, Airports-Brazil, Amazon-Photo, "
-                "Roman-Empire, Minesweeper, Actor, Cornell, Texas."
-            )
+            raise ValueError(f"Dataset PyG não suportado: {name}")
 
         return normalize_pyg_data(dataset[0], self.device)
 

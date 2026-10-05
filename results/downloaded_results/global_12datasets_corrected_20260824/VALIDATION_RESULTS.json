@@ -1,0 +1,99 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "check": "selected_rates.csv",
+      "ok": true,
+      "detail": "rows=3600; datasets=12; dataset_column=True"
+    },
+    {
+      "check": "all_runs_long.csv",
+      "ok": true,
+      "detail": "rows=21600; datasets=12; dataset_column=True"
+    },
+    {
+      "check": "final_selected_test_results.csv",
+      "ok": true,
+      "detail": "rows=36; datasets=12; dataset_column=True"
+    },
+    {
+      "check": "raw_feature_delaunay_results.csv",
+      "ok": true,
+      "detail": "rows=36; datasets=12; dataset_column=True"
+    },
+    {
+      "check": "raw_feature_delaunay_all_runs.csv",
+      "ok": true,
+      "detail": "rows=3600; datasets=12; dataset_column=True"
+    },
+    {
+      "check": "raw_feature_delaunay_comparison.csv",
+      "ok": true,
+      "detail": "rows=3600; datasets=12; dataset_column=True"
+    },
+    {
+      "check": "umap_trustworthiness.csv",
+      "ok": true,
+      "detail": "rows=24; datasets=12; dataset_column=True"
+    },
+    {
+      "check": "selected_before_after_structural_metrics.csv",
+      "ok": true,
+      "detail": "rows=3600; datasets=12; dataset_column=True"
+    },
+    {
+      "check": "original_graph_metrics.csv",
+      "ok": true,
+      "detail": "rows=12; datasets=12; dataset_column=True"
+    },
+    {
+      "check": "selected_rewired_graph_metrics.csv",
+      "ok": true,
+      "detail": "rows=84; datasets=12; dataset_column=True"
+    },
+    {
+      "check": "structural_metric_correlations.csv",
+      "ok": true,
+      "detail": "rows=24"
+    },
+    {
+      "check": "structural_correlation_sensitivity.csv",
+      "ok": true,
+      "detail": "rows=112"
+    },
+    {
+      "check": "density_confounder_analysis.csv",
+      "ok": true,
+      "detail": "rows=7"
+    },
+    {
+      "check": "baseline_saturation_analysis.csv",
+      "ok": true,
+      "detail": "rows=1"
+    },
+    {
+      "check": "structural_delta_correlations.csv",
+      "ok": true,
+      "detail": "rows=14"
+    },
+    {
+      "check": "paired_statistical_tests.csv",
+      "ok": true,
+      "detail": "rows=36"
+    },
+    {
+      "check": "UMAP trustworthiness completeness",
+      "ok": true,
+      "detail": "missing_trustworthiness=0; sources=2; two_sources_per_dataset=True"
+    },
+    {
+      "check": "global figures",
+      "ok": true,
+      "detail": "png_files=9"
+    }
+  ],
+  "scientific_note": {
+    "effective_resistance_missing_values": 3,
+    "interpretation": "Effective-resistance values can be absent when the numerical solver does not converge. Primary lambda2, Cheeger, density and homophily analyses remain complete across 12 datasets."
+  }
+}

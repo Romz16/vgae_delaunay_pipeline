@@ -14,10 +14,14 @@ LOGGER = logging.getLogger("vgae_delaunay_pipeline.vgae_delaunay_rewiring")
 
 
 class VGAEDelaunayRewirer:
+    """Apply percentage-based VGAE rewiring to a Delaunay candidate graph.
 
-    def __init__(
-        self, add_self_loops: bool = True, device: torch.device | None = None
-    ) -> None:
+    This reproduces the experimental idea used previously: the base graph for
+    the rewired condition is the DGlf Delaunay graph. A ratio of 0% therefore
+    means a pure DGlf/Delaunay graph, not the original graph baseline.
+    """
+
+    def __init__(self, add_self_loops: bool = True, device: torch.device | None = None) -> None:
         """Initialize the rewirer.
 
         Args:
@@ -34,7 +38,17 @@ class VGAEDelaunayRewirer:
         ratio: float,
         num_nodes: int,
     ) -> torch.Tensor:
+        """Remove low-similarity Delaunay edges and add high-similarity VGAE edges.
 
+        Args:
+            edge_index: DGlf/Delaunay edge index.
+            vgae_embeddings: VGAE embeddings with shape [num_nodes, dim].
+            ratio: Percentage of Delaunay edges to replace, in [0, 1].
+            num_nodes: Number of nodes.
+
+        Returns:
+            Rewired ``edge_index``.
+        """
         if not 0.0 <= ratio <= 1.0:
             raise ValueError("ratio precisa estar entre 0 e 1.")
         if vgae_embeddings.shape[0] != num_nodes:
@@ -58,23 +72,15 @@ class VGAEDelaunayRewirer:
 
         added = self._add_best_edges(graph, sim_matrix, k, num_nodes)
         if added < k:
-            LOGGER.warning(
-                "Foram adicionadas %d/%d novas arestas no rewiring.", added, k
-            )
+            LOGGER.warning("Foram adicionadas %d/%d novas arestas no rewiring.", added, k)
 
-        new_edge_index = (
-            torch.tensor(list(graph.edges()), dtype=torch.long).t().contiguous()
-        )
+        new_edge_index = torch.tensor(list(graph.edges()), dtype=torch.long).t().contiguous()
         return self._finalize(new_edge_index, num_nodes)
 
-    def _add_best_edges(
-        self, graph: nx.Graph, sim_matrix: np.ndarray, k: int, num_nodes: int
-    ) -> int:
+    def _add_best_edges(self, graph: nx.Graph, sim_matrix: np.ndarray, k: int, num_nodes: int) -> int:
         """Add up to k globally most similar non-existing edges."""
         flat = sim_matrix.reshape(-1)
-        search_size = min(
-            num_nodes * num_nodes, max(k * 10, (k + graph.number_of_edges()) * 3)
-        )
+        search_size = min(num_nodes * num_nodes, max(k * 10, (k + graph.number_of_edges()) * 3))
         candidate_ids = np.argpartition(flat, -search_size)[-search_size:]
         candidate_ids = candidate_ids[np.argsort(-flat[candidate_ids])]
 

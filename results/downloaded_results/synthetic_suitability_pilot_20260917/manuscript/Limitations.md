@@ -1,0 +1,3 @@
+## Limitations
+
+Synthetic families provide controlled interventions but cannot reproduce every dependency between topology, attributes, and labels found in empirical graphs. Structural variables remain correlated even under matched designs, so the fitted score is predictive rather than a complete causal estimand. The auxiliary GCN makes the treatment task-informed, whereas the indicator is intentionally topology-only; irreducible uncertainty is therefore expected when feature quality varies. External validation contains only twelve real datasets and is underpowered for refitting or threshold revision. The frozen rule must not be adjusted after inspecting those outcomes. Computational conclusions also require measurements on identical hardware and software environments.

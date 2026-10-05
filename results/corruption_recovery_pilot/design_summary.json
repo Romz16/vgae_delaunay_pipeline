@@ -1,0 +1,10 @@
+{
+  "profile": "recovery_pilot",
+  "configurations": 60,
+  "independent_graph_instances": 180,
+  "feature_label_tasks": 540,
+  "nested_pipeline_runs": 1080,
+  "gnn_conditions_per_nested_run": 15,
+  "estimated_gnn_fits": 16200,
+  "scientific_unit_for_indicator": "independent_graph_instance"
+}

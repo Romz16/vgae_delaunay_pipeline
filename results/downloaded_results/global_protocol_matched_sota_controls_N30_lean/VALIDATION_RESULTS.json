@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "expected_rows": {
+    "sota_all_runs": 5760,
+    "sota_selected_runs": 1440,
+    "constructor_all_runs": 25200,
+    "constructor_selected_runs": 5040
+  },
+  "actual_rows": {
+    "sota_all_runs": 5760,
+    "sota_selected_runs": 1440,
+    "constructor_all_runs": 25200,
+    "constructor_selected_runs": 5040
+  },
+  "checks": {
+    "sota_all_runs": true,
+    "sota_selected_runs": true,
+    "constructor_all_runs": true,
+    "constructor_selected_runs": true
+  },
+  "datasets": [
+    "Actor",
+    "Airports-Brazil",
+    "Airports-Europe",
+    "Airports-USA",
+    "Amazon-Photo",
+    "Coauthor-CS",
+    "Cora",
+    "Cornell",
+    "Minesweeper",
+    "Pubmed",
+    "Roman-Empire",
+    "Texas"
+  ],
+  "final_runs": 30
+}

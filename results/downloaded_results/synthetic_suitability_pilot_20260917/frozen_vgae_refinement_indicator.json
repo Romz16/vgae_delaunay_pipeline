@@ -1,0 +1,34 @@
+{
+  "status": "FROZEN_ON_SYNTHETIC_ONLY",
+  "features": [
+    "lambda2_norm_laplacian",
+    "density",
+    "avg_degree",
+    "degree_cv",
+    "approx_avg_shortest_path",
+    "approx_diameter",
+    "num_components",
+    "largest_cc_ratio",
+    "num_isolates",
+    "effective_resistance_sample"
+  ],
+  "target": "gain_vgae",
+  "success_definition_pp": 0.5,
+  "recommend_threshold": 0.2512346318588003,
+  "avoid_threshold": 0.879519796851773,
+  "oof_metrics": {
+    "accuracy": 0.9609756097560975,
+    "balanced_accuracy": 0.5555555555555556,
+    "precision": 0.9607843137254902,
+    "recall": 1.0,
+    "f1": 0.98,
+    "specificity": 0.1111111111111111,
+    "roc_auc": 0.5436507936507937,
+    "tn": 1,
+    "fp": 8,
+    "fn": 0,
+    "tp": 196,
+    "negative_outcome_rate_among_recommended": 0.0392156862745098
+  },
+  "external_real_data_used_for_fit": false
+}

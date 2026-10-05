@@ -1,0 +1,60 @@
+{
+  "status": "FROZEN_ON_SYNTHETIC_ONLY",
+  "model_name": "two_metric_logistic__lambda2_norm_laplacian__density",
+  "features": [
+    "lambda2_norm_laplacian",
+    "density"
+  ],
+  "target": "success_0_5",
+  "success_definition_pp": 0.5,
+  "recommend_threshold": 0.059176089390494666,
+  "avoid_threshold": 0.99,
+  "uncertain_region": [
+    0.99,
+    0.059176089390494666
+  ],
+  "oof_metrics": {
+    "accuracy": 0.9512195121951219,
+    "balanced_accuracy": 0.5454545454545454,
+    "precision": 1.0,
+    "recall": 0.09090909090909091,
+    "f1": 0.16666666666666666,
+    "specificity": 1.0,
+    "roc_auc": 0.47867853795688853,
+    "tn": 194,
+    "fp": 0,
+    "fn": 10,
+    "tp": 1,
+    "negative_outcome_rate_among_recommended": 0.0
+  },
+  "false_positive_cost": 3.0,
+  "fit_graphs": 205,
+  "fit_families": [
+    "barabasi_albert",
+    "degree_matched_bottleneck",
+    "erdos_renyi",
+    "random_regular",
+    "sbm_density_matched",
+    "watts_strogatz"
+  ],
+  "external_real_data_used_for_fit": false,
+  "synthetic_training_fingerprint": "04a46944616df8c490968aeb671c8404a2c40bc5447f5023f010fc527c703d5a",
+  "standardized_coefficients": [
+    0.7464349543854689,
+    -0.24759453851063573
+  ],
+  "intercept": -4.187748351358372,
+  "imputer_medians": [
+    0.1531002354164729,
+    0.0329149232914923
+  ],
+  "scaler_mean": [
+    0.18444487334742965,
+    0.037720175528115074
+  ],
+  "scaler_scale": [
+    0.16513939775067277,
+    0.013318463064926402
+  ],
+  "formula_note": "Apply the saved imputer and scaler, then sigmoid(intercept + sum(coef_i*z_i))."
+}

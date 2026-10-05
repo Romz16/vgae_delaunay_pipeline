@@ -1,3 +1,5 @@
+"""Reproducibility helpers."""
+
 from __future__ import annotations
 
 import random
@@ -7,6 +9,11 @@ import torch
 
 
 def set_seed(seed: int) -> None:
+    """Set random seeds for Python, NumPy and PyTorch.
+
+    Args:
+        seed: Integer seed used across all supported RNGs.
+    """
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)

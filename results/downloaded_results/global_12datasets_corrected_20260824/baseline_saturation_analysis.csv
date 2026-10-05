@@ -1,0 +1,2 @@
+x,y,pearson_r,pearson_p,spearman_rho,spearman_p,n
+baseline_f1_mean,corrected_mean_gain,-0.4714804729705245,0.12178093868702128,-0.5874125874125874,0.044609296463363105,12

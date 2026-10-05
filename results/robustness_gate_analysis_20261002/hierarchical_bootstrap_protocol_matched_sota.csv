@@ -1,0 +1,3 @@
+comparison,metric,n_datasets,n_paired_executions,point_estimate_mean_pp,bootstrap_ci95_low_pp,bootstrap_ci95_high_pp,bootstrap_replicates,resampling
+proposed minus DiffWire CT,proposed selected test macro-F1 minus baseline selected test macro-F1 (percentage points),12,360,4.616301181728536,1.6592510708507189,7.629602231705365,10000,datasets with replacement; then shared backbone/seed executions within each drawn dataset
+proposed minus SDRF,proposed selected test macro-F1 minus baseline selected test macro-F1 (percentage points),12,1080,2.8081603496050564,-1.5670931418029082,7.280513557182378,10000,datasets with replacement; then shared backbone/seed executions within each drawn dataset

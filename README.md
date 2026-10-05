@@ -1,55 +1,62 @@
-# VGAE + DGlf/Delaunay Rewiring Pipeline
+# Embedding-Guided Delaunay Rewiring
 
-Pipeline end-to-end para experimentos de rewiring em GNNs:
+This repository contains the reproducible implementation and curated experimental
+artifacts for embedding-guided graph rewiring in node-classification tasks.
 
-1. Otimização de hiperparâmetros do VGAE via Optuna.
-2. Treinamento do VGAE final e persistência dos embeddings `.npy`.
-3. Otimização de GCN, GCN Residual, GraphSAGE e GAT via Optuna.
-4. Construção de DGlf: GCN auxiliar -> UMAP 2D -> Delaunay.
-5. Rewiring DGlf + VGAE nas taxas configuradas.
-6. Avaliação final com média, desvio, CI95 e exportação para CSV/Markdown.
+The proposed pipeline learns a task-informed node representation, projects it
+with UMAP, builds a geometric Delaunay graph, optionally refines it with a VGAE,
+and selects the topology using validation data only before final test evaluation.
 
-## Instalação
-
-```bash
-python3 -m pip install --upgrade pip setuptools wheel
-python3 -m pip install -r requirements.txt
-```
-
-## Execução com dataset PyG
-
-```bash
-python3 main.py --dataset Cora --root ./data --output-dir outputs/cora
-```
-
-Exemplos de nomes suportados:
+## Repository layout
 
 ```text
-Cora, Pubmed, Citeseer, Cornell, Texas, Wisconsin, Actor, WikiCS,
-LastFMAsia, Flickr, Chameleon, Squirrel, Crocodile,
-Airports-Brazil, Airports-USA, Airports-Europe,
-Roman-empire, Amazon-ratings, Minesweeper, Tolokers, Questions
+src/        Core pipeline, graph constructors, models, and evaluation utilities
+scripts/    Reproducible experiment and analysis entry points
+tests/      Automated tests and smoke-test helpers
+docs/       Methodological notes and experiment documentation
+results/    Curated per-seed outputs, analyses, and result inventories
 ```
 
-## Execução com arquivo de grafo
+## Method overview
+
+1. Train an auxiliary GCN to learn a task-informed representation from the
+   training labels.
+2. Use UMAP to obtain a two-dimensional geometric layout of the learned
+   embeddings.
+3. Construct a Delaunay graph from that layout.
+4. Optionally combine the geometric graph with VGAE-based edge refinement.
+5. Select a candidate topology using validation F1 only; the test split remains
+   unseen until the final evaluation.
+6. Train and evaluate the downstream GNN on the selected topology.
+
+The `Delaunay + VGAE 0%` condition is the pure geometric Delaunay graph. It is
+not the original-graph baseline, which is always reported separately.
+
+## Installation
 
 ```bash
-python3 main.py --graph-file ./graph.pt --dataset-name MeuGrafo --output-dir outputs/meu_grafo
+python -m pip install --upgrade pip setuptools wheel
+python -m pip install -r requirements.txt
 ```
 
-Formatos suportados:
-
-- `.pt` / `.pth`: `torch_geometric.data.Data` ou dict com `edge_index`, `x`, `y`.
-- `.npz`: arrays `edge_index`, `x`, `y`.
-- `.graphml`, `.gexf`, `.gpickle`: NetworkX.
-- `.csv`: edge list com colunas `source,target`.
-
-Para classificação de nós, o grafo precisa ter labels `y`. Se não houver features `x`, o código cria features simples baseadas em grau.
-
-## Smoke test rápido
+## Run a dataset experiment
 
 ```bash
-python3 main.py \
+python main.py --dataset Cora --root ./data --output-dir outputs/cora
+```
+
+Examples of supported PyG datasets include `Cora`, `Citeseer`, `Pubmed`,
+`Cornell`, `Texas`, `Wisconsin`, `Chameleon`, `Squirrel`, `Actor`, `WikiCS`,
+`Flickr`, `LastFMAsia`, and the Airports datasets.
+
+The pipeline can also load a graph from `.pt`, `.pth`, `.npz`, GraphML, GEXF,
+GPickle, or a CSV edge list. For node classification, labels are required; if
+node features are absent, degree-based features are generated.
+
+## Fast smoke test
+
+```bash
+python main.py \
   --dataset Wisconsin \
   --output-dir outputs/wisconsin_smoke \
   --vgae-trials 3 \
@@ -61,19 +68,18 @@ python3 main.py \
   --final-runs 2
 ```
 
-## Saídas
+## Published results
 
-```text
-outputs/
-├── embeddings/<dataset>_vgae_embeddings.npy
-├── results/tabela_resultados_<dataset>_100runs.csv
-├── results/tabela_resultados_<dataset>_100runs.md
-├── best_vgae_params.json
-├── best_gnn_params.json
-└── pipeline_config.json
-```
+The [`results/`](results/) directory contains the per-seed experimental data and
+derived analyses used in the study, including global 12-dataset runs, robustness
+analyses, synthetic and corruption experiments, matched baseline controls, and
+the Citeseer/Wisconsin extension. See [`results/README.md`](results/README.md)
+for an inventory and interpretation caveats.
 
-## Observação metodológica
+## Reproducibility principles
 
-A condição `DGlf + VGAE 0%` usa o grafo DGlf/Delaunay puro. Ela não é igual à baseline original.
-A baseline é sempre `Baseline (Original)`.
+- Dataset versions, splits, seeds, tuning budgets, and validation selection are
+  recorded in the experiment artifacts.
+- Candidate selection is validation-only; no candidate is selected by test F1.
+- Reported SDRF and DiffWire-CT controls are protocol-matched adaptations, not
+  unchanged executions of their upstream repositories.

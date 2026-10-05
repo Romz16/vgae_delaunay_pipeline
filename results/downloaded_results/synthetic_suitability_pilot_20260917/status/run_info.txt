@@ -1,0 +1,11 @@
+start_timestamp=2026-09-16T20:34:54+00:00
+hostname=4086d1a60079
+container=romulo-gnn
+project_directory=/media/work/romulorocha/vgae_delaunay_pipeline_synthetic_suitability
+workers=3
+device=cpu
+threads_per_worker=12
+profile=pilot
+command=scripts/run_synthetic_pilot_3workers.sh /media/work/romulorocha/vgae_delaunay_pipeline_synthetic_suitability
+Python 3.10.14
+0, NVIDIA GeForce RTX 3090, 24576 MiB

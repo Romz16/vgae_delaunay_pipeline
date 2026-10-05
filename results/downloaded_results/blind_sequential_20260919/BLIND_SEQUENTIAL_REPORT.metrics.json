@@ -1,0 +1,63 @@
+{
+  "overall": {
+    "n": 96,
+    "accuracy": 0.6458333333333334,
+    "balanced_accuracy": 0.5555555555555556,
+    "roc_auc": 0.43039591315453385,
+    "brier_score": 0.21599968250696452,
+    "precision": 0.12121212121212122,
+    "recall_sensitivity": 0.4444444444444444,
+    "specificity": 0.6666666666666666,
+    "tn": 58,
+    "fp": 29,
+    "fn": 5,
+    "tp": 4
+  },
+  "waves": [
+    {
+      "n": 32,
+      "accuracy": 0.84375,
+      "balanced_accuracy": 0.48214285714285715,
+      "roc_auc": 0.23214285714285712,
+      "brier_score": 0.14974392201655468,
+      "precision": 0.0,
+      "recall_sensitivity": 0.0,
+      "specificity": 0.9642857142857143,
+      "tn": 27,
+      "fp": 1,
+      "fn": 4,
+      "tp": 0,
+      "wave": "blind_wave1_geometric"
+    },
+    {
+      "n": 32,
+      "accuracy": 0.90625,
+      "balanced_accuracy": 0.46774193548387094,
+      "roc_auc": 0.29032258064516125,
+      "brier_score": 0.19789714042755596,
+      "precision": 0.0,
+      "recall_sensitivity": 0.0,
+      "specificity": 0.9354838709677419,
+      "tn": 29,
+      "fp": 2,
+      "fn": 1,
+      "tp": 0,
+      "wave": "blind_wave2_degree_corrected"
+    },
+    {
+      "n": 32,
+      "accuracy": 0.1875,
+      "balanced_accuracy": 0.5357142857142857,
+      "roc_auc": 0.375,
+      "brier_score": 0.30035798507678296,
+      "precision": 0.13333333333333333,
+      "recall_sensitivity": 1.0,
+      "specificity": 0.07142857142857142,
+      "tn": 2,
+      "fp": 26,
+      "fn": 0,
+      "tp": 4,
+      "wave": "blind_wave3_hierarchical"
+    }
+  ]
+}

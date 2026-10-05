@@ -1,0 +1,17 @@
+{
+  "n": 32,
+  "accuracy": 0.1875,
+  "balanced_accuracy": 0.5357142857142857,
+  "roc_auc": 0.375,
+  "brier_score": 0.30035798507678296,
+  "precision": 0.13333333333333333,
+  "recall_sensitivity": 1.0,
+  "specificity": 0.07142857142857142,
+  "tn": 2,
+  "fp": 26,
+  "fn": 0,
+  "tp": 4,
+  "wave": "blind_wave3_hierarchical",
+  "prediction_file_sha256": "5d0fd08d1673f83a5283037d90eed5abd9c58fa01a4edf7c2b784f4615309832",
+  "reveal_timestamp_utc": "2026-09-18T14:58:07.058444+00:00"
+}

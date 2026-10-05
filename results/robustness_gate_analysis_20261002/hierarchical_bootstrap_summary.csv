@@ -1,0 +1,2 @@
+comparison,metric,n_datasets,n_paired_executions,point_estimate_mean_pp,bootstrap_ci95_low_pp,bootstrap_ci95_high_pp,bootstrap_replicates,resampling,random_seed
+validation-selected rewiring minus original graph,test macro-F1 gain (percentage points),12,3600,2.5765920357202896,-1.5907337417274159,7.1516270949966065,10000,datasets with replacement; then paired backbone/seed executions within each drawn dataset,20261002

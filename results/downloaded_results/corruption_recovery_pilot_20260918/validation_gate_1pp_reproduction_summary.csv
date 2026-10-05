@@ -1,0 +1,3 @@
+aggregation_level,n,mean_gain_pp,median_gain_pp,std_gain_pp,bootstrap_ci95_low_pp,bootstrap_ci95_high_pp,positive_fraction,gain_gt_0_5pp_fraction,wilcoxon_p_two_sided,note
+execution_seed,1080,5.397842191757679,4.304398201543686,9.385363669046319,,,0.6425925925925926,0.6296296296296297,9.347915929765697e-62,Rows are nested within graph_id; do not treat this p-value as the primary independent-unit inference.
+graph_mean_primary,180,5.397842191757679,5.3562656228795245,3.8728271390939226,4.832935114572858,5.971168020103732,0.9388888888888889,0.8944444444444445,5.578085369030033e-29,"Primary unit used for the reported +5.398 p.p., 93.9%, and 89.4% figures."
