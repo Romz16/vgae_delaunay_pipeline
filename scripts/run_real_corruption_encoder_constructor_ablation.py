@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Real-graph corruption, encoder/refiner matrix and proximity-constructor ablation."""
 
 from __future__ import annotations
 

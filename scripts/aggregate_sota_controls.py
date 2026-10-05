@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Aggregate and validate protocol-matched SOTA/control outputs."""
 
 from __future__ import annotations
 

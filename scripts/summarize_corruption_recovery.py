@@ -1,4 +1,3 @@
-"""Summarize the completed corruption/recovery pilot and test suitability signals."""
 
 from __future__ import annotations
 

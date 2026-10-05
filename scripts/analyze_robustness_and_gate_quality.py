@@ -1,16 +1,3 @@
-"""Post-hoc robustness analyses from saved per-seed experiment outputs.
-
-The script does not retrain models or use test values for selection.  It
-reconstructs each validation-based choice using only ``val_f1``, then joins the
-corresponding held-out ``test_f1`` to estimate the outcome.  It produces:
-
-1. a dataset/seed hierarchical bootstrap for the primary 12-dataset protocol;
-2. leave-one-dataset-out and leave-all-Airports-out sensitivity analyses; and
-3. selection-regret diagnostics for the explicit 1 p.p. validation gate.
-
-Run from the repository root:
-    python scripts/analyze_robustness_and_gate_quality.py
-"""
 
 from __future__ import annotations
 
@@ -34,13 +21,6 @@ KEYS_GATE = ["graph_id", "task_id", "pipeline_seed"]
 
 
 def validation_select_rewiring(main: pd.DataFrame) -> pd.DataFrame:
-    """Freeze the best rewired ratio by validation F1, then attach baseline.
-
-    This reproduces the primary protocol's comparison: original graph versus
-    the best *rewired* candidate.  The original graph is not included in this
-    selector because the legacy 12-dataset protocol selected the rewiring rate
-    among rewired candidates; the later 1 p.p. gate is analysed separately.
-    """
     baseline = main.loc[main["is_baseline"].astype(str).str.lower().eq("true")].copy()
     rewired = main.loc[~main["is_baseline"].astype(str).str.lower().eq("true")].copy()
     if baseline.duplicated(KEYS_MAIN).any() or not set(KEYS_MAIN).issubset(rewired):
@@ -62,7 +42,6 @@ def validation_select_rewiring(main: pd.DataFrame) -> pd.DataFrame:
 
 
 def hierarchical_bootstrap_gain(selected: pd.DataFrame) -> tuple[pd.DataFrame, np.ndarray]:
-    """Two-stage bootstrap: datasets, then paired backbone/seed executions."""
     datasets = np.array(sorted(selected["dataset"].unique()))
     by_dataset = {name: group["gain_pp"].to_numpy(dtype=float) for name, group in selected.groupby("dataset")}
     rng = np.random.default_rng(RNG_SEED)
@@ -93,7 +72,6 @@ def hierarchical_bootstrap_gain(selected: pd.DataFrame) -> tuple[pd.DataFrame, n
 def hierarchical_bootstrap_pairwise_difference(
     paired: pd.DataFrame, comparison: str, n_bootstrap: int = N_BOOTSTRAP
 ) -> pd.DataFrame:
-    """Hierarchical CI for a protocol-matched method-vs-method difference."""
     datasets = np.array(sorted(paired["dataset"].unique()))
     by_dataset = {name: group["difference_pp"].to_numpy(dtype=float) for name, group in paired.groupby("dataset")}
     # A different fixed stream per comparison leaves results reproducible without
@@ -120,12 +98,6 @@ def hierarchical_bootstrap_pairwise_difference(
 
 
 def protocol_matched_sota_bootstraps(main_selected: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Compare validation-selected proposed rows to validation-selected SOTA rows.
-
-    The SOTA bundle contains 30 common seeds. SDRF has all three backbones;
-    DiffWire CT is available only for GCN. Each method's candidate ratio is
-    selected by its own validation F1 before test values are compared.
-    """
     sota = pd.read_csv(SOTA_SOURCE)
     sota["ratio_order"] = pd.to_numeric(sota["candidate_ratio"], errors="raise")
     selected_sota = (
@@ -182,7 +154,6 @@ def leave_out(selected: pd.DataFrame) -> pd.DataFrame:
 
 
 def gate_regret(wide: pd.DataFrame, long: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Measure the test-performance opportunity cost of the frozen 1 p.p. gate."""
     eligible = long.loc[long["eligible_for_gate_1pp"].astype(str).str.lower().eq("true")].copy()
     eligible["ratio_order"] = pd.to_numeric(eligible["ratio"], errors="coerce").fillna(-1.0)
     # Test oracle is for diagnosis only: it never feeds the gate selection.

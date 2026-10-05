@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Run the auxiliary-only and disjoint-validation ablation on selected datasets."""
 
 from __future__ import annotations
 

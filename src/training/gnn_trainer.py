@@ -1,4 +1,3 @@
-"""Training and evaluation loops for node-classification GNNs."""
 
 from __future__ import annotations
 
@@ -20,10 +19,8 @@ from src.utils.seed import set_seed
 
 
 class GNNTrainer:
-    """Train and evaluate GNN backbones on a fixed graph."""
 
     def __init__(self, config: PipelineConfig, device: torch.device) -> None:
-        """Initialize the trainer."""
         self.config = config
         self.device = device
 
@@ -38,12 +35,6 @@ class GNNTrainer:
         track_test: bool = True,
         edge_weight: torch.Tensor | None = None,
     ) -> dict[str, float]:
-        """Train once and select the checkpoint by validation metric.
-
-        The final revision protocol uses validation F1 to choose checkpoints and
-        to select the rewiring rate.  ``selection_metric`` can be changed to
-        ``acc`` for backwards-compatible diagnostics.
-        """
         set_seed(seed)
         data = apply_node_split(data, seed=seed, config=self.config.split, device=self.device)
         edge_index = edge_index.to(self.device)
@@ -127,12 +118,6 @@ class GNNTrainer:
         epochs: int,
         edge_weight: torch.Tensor | None = None,
     ) -> dict[str, float]:
-        """Train on ``train_mask`` and checkpoint only on ``inner_val_mask``.
-
-        ``topology_val_mask`` is evaluated after checkpoint selection and is
-        intended exclusively for choosing a graph candidate. The test result is
-        also read only after the checkpoint has been fixed.
-        """
         required = ("train_mask", "inner_val_mask", "topology_val_mask", "test_mask")
         missing = [name for name in required if not hasattr(data, name)]
         if missing:
@@ -213,7 +198,6 @@ class GNNTrainer:
         num_runs: int,
         epochs: int,
     ) -> dict[str, object]:
-        """Evaluate one graph condition over repeated splits."""
         accs: list[float] = []
         f1s: list[float] = []
         losses: list[float] = []
@@ -269,13 +253,6 @@ class GNNTrainer:
         epochs: int,
         label_fn,
     ) -> dict[str, object]:
-        """Evaluate baseline and choose rewiring rate by validation F1 per seed.
-
-        For each seed/split, all candidate rewiring rates are trained using the
-        same split.  The rate ``r*`` is chosen exclusively by validation metric;
-        the corresponding test score is then recorded as the official rewired
-        result for that seed.
-        """
         all_runs: list[dict[str, object]] = []
         selected_runs: list[dict[str, object]] = []
         baseline_f1s: list[float] = []
@@ -393,7 +370,6 @@ class GNNTrainer:
         params: GNNParams,
         epochs: int,
     ):
-        """Build a learning-rate scheduler from model params."""
         scheduler = params.scheduler.lower()
         if scheduler == "cosine":
             return CosineAnnealingLR(optimizer, T_max=epochs)

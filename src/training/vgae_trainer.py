@@ -1,4 +1,3 @@
-"""Training utilities for VGAE embedding extraction."""
 
 from __future__ import annotations
 
@@ -13,14 +12,8 @@ from src.utils.seed import set_seed
 
 
 class VGAETrainer:
-    """Train VGAE models and extract latent embeddings."""
 
     def __init__(self, device: torch.device) -> None:
-        """Initialize the trainer.
-
-        Args:
-            device: Target PyTorch device.
-        """
         self.device = device
 
     def train(
@@ -31,18 +24,6 @@ class VGAETrainer:
         seed: int,
         edge_index: torch.Tensor | None = None,
     ) -> VGAE:
-        """Train a VGAE model.
-
-        Args:
-            data: Input graph.
-            params: VGAE hyperparameters.
-            epochs: Number of training epochs.
-            seed: Random seed.
-            edge_index: Optional edge index. Defaults to ``data.edge_index``.
-
-        Returns:
-            Trained VGAE model.
-        """
         set_seed(seed)
         graph_edges = (edge_index if edge_index is not None else data.edge_index).to(self.device)
         model = build_vgae(int(data.num_features), params, self.device)
@@ -61,16 +42,6 @@ class VGAETrainer:
 
     @torch.no_grad()
     def extract_embeddings(self, model: VGAE, data: Data, edge_index: torch.Tensor | None = None) -> np.ndarray:
-        """Extract VGAE latent embeddings from a trained model.
-
-        Args:
-            model: Trained VGAE model.
-            data: Input graph.
-            edge_index: Optional edge index. Defaults to ``data.edge_index``.
-
-        Returns:
-            NumPy array with shape [num_nodes, latent_channels].
-        """
         model.eval()
         graph_edges = (edge_index if edge_index is not None else data.edge_index).to(self.device)
         z = model.encode(data.x, graph_edges)

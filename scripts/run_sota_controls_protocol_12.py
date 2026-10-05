@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Durable sequential launcher for the N=12 SOTA and constructor reruns."""
 
 from __future__ import annotations
 

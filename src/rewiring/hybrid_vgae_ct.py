@@ -1,4 +1,3 @@
-"""Hybrid VGAE + commute-time/effective-resistance Delaunay rewiring."""
 
 from __future__ import annotations
 
@@ -21,25 +20,11 @@ LOGGER = logging.getLogger("vgae_delaunay_pipeline.hybrid_vgae_ct_rewiring")
 
 @dataclass(frozen=True)
 class SpectralResistanceModel:
-    """Low-rank spectral model for approximate effective resistance.
-
-    Effective resistance can be written as a squared Euclidean distance in the
-    Laplacian pseudoinverse embedding. This class stores the spectral
-    coordinates used to evaluate that distance for arbitrary node pairs.
-    """
 
     coordinates: np.ndarray
     eps: float = 1e-12
 
     def resistance(self, pairs: np.ndarray) -> np.ndarray:
-        """Return effective-resistance estimates for node pairs.
-
-        Args:
-            pairs: Integer array with shape ``[num_pairs, 2]``.
-
-        Returns:
-            One-dimensional array with one resistance value per pair.
-        """
         if pairs.size == 0:
             return np.asarray([], dtype=np.float64)
         diffs = self.coordinates[pairs[:, 0]] - self.coordinates[pairs[:, 1]]
@@ -48,33 +33,11 @@ class SpectralResistanceModel:
 
 
 class EffectiveResistanceScorer:
-    """Build effective-resistance/commute-time scores from a graph.
-
-    For small graphs, the scorer uses a dense eigendecomposition of the graph
-    Laplacian. For larger graphs, it uses a truncated sparse eigendecomposition
-    with the smallest non-zero Laplacian eigenvalues. This is more practical for
-    scientific experimentation than an all-pairs exact pseudoinverse on every
-    dataset.
-    """
 
     def __init__(self, config: RewiringConfig) -> None:
-        """Initialize the scorer.
-
-        Args:
-            config: Rewiring-specific configuration.
-        """
         self.config = config
 
     def fit(self, edge_index: torch.Tensor, num_nodes: int) -> SpectralResistanceModel:
-        """Create a spectral resistance model from an undirected edge index.
-
-        Args:
-            edge_index: Edge index used as the structural graph.
-            num_nodes: Number of nodes.
-
-        Returns:
-            A spectral resistance model.
-        """
         laplacian = self._build_laplacian(edge_index=edge_index, num_nodes=num_nodes)
         if num_nodes <= self.config.ct_exact_max_nodes:
             LOGGER.info("CT/effective resistance: decomposição exata densa para %d nós.", num_nodes)
@@ -88,7 +51,6 @@ class EffectiveResistanceScorer:
         return self._fit_approximate(laplacian, num_nodes)
 
     def _build_laplacian(self, edge_index: torch.Tensor, num_nodes: int):
-        """Build an unweighted sparse graph Laplacian."""
         edges = edge_index.detach().cpu().long().numpy()
         rows = edges[0]
         cols = edges[1]
@@ -100,7 +62,6 @@ class EffectiveResistanceScorer:
         return csgraph.laplacian(adjacency, normed=False).astype(np.float64)
 
     def _fit_exact(self, dense_laplacian: np.ndarray) -> SpectralResistanceModel:
-        """Fit exact Laplacian pseudoinverse coordinates."""
         eigenvalues, eigenvectors = np.linalg.eigh(dense_laplacian)
         mask = eigenvalues > self.config.ct_eps
         if not np.any(mask):
@@ -109,7 +70,6 @@ class EffectiveResistanceScorer:
         return SpectralResistanceModel(coordinates=coordinates, eps=self.config.ct_eps)
 
     def _fit_approximate(self, sparse_laplacian, num_nodes: int) -> SpectralResistanceModel:
-        """Fit low-rank Laplacian pseudoinverse coordinates."""
         k = min(max(2, self.config.ct_num_eigenvectors + 1), num_nodes - 1)
         try:
             eigenvalues, eigenvectors = eigsh(sparse_laplacian, k=k, which="SM", tol=1e-3)
@@ -128,27 +88,6 @@ class EffectiveResistanceScorer:
 
 
 class HybridVGAECTDelaunayRewirer:
-    """Apply hybrid VGAE + CT/effective-resistance Delaunay rewiring.
-
-    The hybrid method preserves the original semantics of the previous pipeline:
-    the rewired condition starts from the DGlf/Delaunay graph, and a ratio of
-    0% means the pure DGlf/Delaunay graph.
-
-    Removal uses a keep-score:
-        alpha * normalized VGAE similarity
-        + (1 - alpha) * normalized effective-resistance importance
-
-    Therefore, low-similarity and low-structural-importance Delaunay edges are
-    removed first, while likely bridge-like edges are protected.
-
-    Addition uses an add-score:
-        alpha * normalized VGAE similarity
-        + (1 - alpha) * normalized CT closeness
-
-    where CT closeness is the inverse of effective resistance. This favors new
-    edges that are semantically similar and structurally close in the global
-    graph geometry.
-    """
 
     def __init__(
         self,
@@ -156,13 +95,6 @@ class HybridVGAECTDelaunayRewirer:
         add_self_loops: bool = True,
         device: torch.device | None = None,
     ) -> None:
-        """Initialize the rewirer.
-
-        Args:
-            config: Rewiring-specific configuration.
-            add_self_loops: Whether to add self-loops after rewiring.
-            device: Target PyTorch device.
-        """
         if not 0.0 <= config.hybrid_alpha <= 1.0:
             raise ValueError("hybrid_alpha precisa estar entre 0 e 1.")
         self.config = config
@@ -177,17 +109,6 @@ class HybridVGAECTDelaunayRewirer:
         ratio: float,
         num_nodes: int,
     ) -> torch.Tensor:
-        """Remove low hybrid-score Delaunay edges and add high hybrid-score pairs.
-
-        Args:
-            edge_index: DGlf/Delaunay edge index.
-            vgae_embeddings: VGAE embeddings with shape ``[num_nodes, dim]``.
-            ratio: Percentage of Delaunay edges to replace, in ``[0, 1]``.
-            num_nodes: Number of nodes.
-
-        Returns:
-            Rewired ``edge_index``.
-        """
         if not 0.0 <= ratio <= 1.0:
             raise ValueError("ratio precisa estar entre 0 e 1.")
         if vgae_embeddings.shape[0] != num_nodes:
@@ -231,7 +152,6 @@ class HybridVGAECTDelaunayRewirer:
         resistance_model: SpectralResistanceModel,
         k: int,
     ) -> None:
-        """Remove edges with the lowest hybrid keep-score."""
         edge_pairs = np.asarray(edges, dtype=np.int64)
         similarities = np.asarray([sim_matrix[u, v] for u, v in edges], dtype=np.float64)
         resistances = resistance_model.resistance(edge_pairs)
@@ -251,7 +171,6 @@ class HybridVGAECTDelaunayRewirer:
         k: int,
         num_nodes: int,
     ) -> int:
-        """Add candidate non-edges with the highest hybrid add-score."""
         candidate_pairs = self._candidate_pairs_by_similarity(graph, sim_matrix, k, num_nodes)
         if candidate_pairs.size == 0:
             return 0
@@ -282,7 +201,6 @@ class HybridVGAECTDelaunayRewirer:
         k: int,
         num_nodes: int,
     ) -> np.ndarray:
-        """Return a pool of candidate pairs using VGAE similarity as prefilter."""
         flat = sim_matrix.reshape(-1)
         multiplier = max(1, self.config.ct_candidate_multiplier)
         min_factor = max(1, self.config.ct_min_search_factor)
@@ -298,7 +216,6 @@ class HybridVGAECTDelaunayRewirer:
         return np.asarray(pairs, dtype=np.int64)
 
     def _finalize(self, edge_index: torch.Tensor, num_nodes: int) -> torch.Tensor:
-        """Convert edge_index to undirected PyG format and optionally add self-loops."""
         edge_index = edge_index.long().contiguous()
         if self.add_self_loops:
             edge_index, _ = add_self_loops(edge_index, num_nodes=num_nodes)
@@ -307,7 +224,6 @@ class HybridVGAECTDelaunayRewirer:
 
     @staticmethod
     def _minmax(values: Iterable[float] | np.ndarray) -> np.ndarray:
-        """Normalize values to [0, 1], returning zeros for constant vectors."""
         array = np.asarray(values, dtype=np.float64)
         if array.size == 0:
             return array

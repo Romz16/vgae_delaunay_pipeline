@@ -1,4 +1,3 @@
-"""Grouped, leakage-safe discovery of interpretable suitability indicators."""
 
 from __future__ import annotations
 
@@ -43,7 +42,6 @@ class CandidateResult:
 
 
 def fit_indicator(config: SyntheticExperimentConfig) -> dict[str, object]:
-    """Discover, evaluate, freeze, and document the structural indicator."""
     out = config.output_dir
     data = pd.read_csv(out / "graph_level_outcomes.csv")
     threshold_pp = config.indicator.primary_success_threshold_pp
@@ -232,7 +230,6 @@ def _fit_refinement_indicator(data,features,groups,config):
 
 
 def _fit_gain_regression(data, features, groups, config):
-    """Predict expected gain with grouped out-of-fold evaluation."""
     y=data["gain_selected_rewiring"].to_numpy(dtype=float)
     cv=GroupKFold(n_splits=min(5,len(np.unique(groups))))
     models={
@@ -252,7 +249,6 @@ def _fit_gain_regression(data, features, groups, config):
 
 
 def validate_on_real_datasets(config: SyntheticExperimentConfig, metrics_csv: Path, gains_csv: Path) -> pd.DataFrame:
-    """Apply the already frozen indicator to real data without refitting."""
     model=joblib.load(config.output_dir/"frozen_suitability_indicator.joblib")
     manifest=json.loads((config.output_dir/"frozen_suitability_indicator.json").read_text(encoding="utf-8"))
     metrics=pd.read_csv(metrics_csv); gains=pd.read_csv(gains_csv)

@@ -1,4 +1,3 @@
-"""Geometric proximity graph constructors derived from two-dimensional points."""
 
 from __future__ import annotations
 
@@ -14,7 +13,6 @@ from torch_geometric.utils import to_undirected
 
 @dataclass(frozen=True)
 class ProximityGraph:
-    """A geometric graph and its construction metadata."""
 
     edge_index: torch.Tensor
     metadata: dict[str, object]
@@ -55,12 +53,6 @@ def build_proximity_graphs(
     constructors: Iterable[str] = ("delaunay", "gabriel", "rng", "mst"),
     device: torch.device | None = None,
 ) -> dict[str, ProximityGraph]:
-    """Build Delaunay, Gabriel, relative-neighborhood and Euclidean MST graphs.
-
-    In the Euclidean plane, Gabriel, RNG and MST are subgraphs of Delaunay.
-    Filtering only Delaunay edges therefore gives the exact proximity graphs
-    while avoiding an all-pairs edge search.
-    """
     points = np.asarray(points, dtype=np.float64)
     if points.ndim != 2 or points.shape[1] != 2:
         raise ValueError("Proximity graph constructors require an [n, 2] point array.")

@@ -1,4 +1,3 @@
-"""Synthetic graph families and controlled node-classification tasks."""
 
 from __future__ import annotations
 
@@ -51,7 +50,6 @@ def stable_seed(*parts: object, modulus: int = 2**31 - 1) -> int:
 
 
 def configuration_grid(cfg: GraphDesignConfig) -> list[GraphSpecification]:
-    """Build the preregistered factorial configuration grid."""
     specs: list[GraphSpecification] = []
     for n, degree in product(cfg.node_counts, cfg.target_avg_degrees):
         if "sbm_density_matched" in cfg.families:
@@ -142,7 +140,6 @@ def _regular_degree(degree: int, n: int) -> int:
 
 
 def generate_graphs(cfg: GraphDesignConfig, master_seed: int) -> Iterable[SyntheticGraph]:
-    """Yield independent graph instances for every registered configuration."""
     for spec in configuration_grid(cfg):
         for instance in range(cfg.instances_per_configuration):
             seed = stable_seed(master_seed, spec.configuration_id, instance)
@@ -156,7 +153,6 @@ def generate_one(
     seed: int,
     cfg: GraphDesignConfig,
 ) -> tuple[nx.Graph, np.ndarray, dict[str, object]]:
-    """Generate one graph and deterministic structural labels."""
     last_graph: nx.Graph | None = None
     for attempt in range(cfg.max_generation_attempts):
         attempt_seed = stable_seed(seed, attempt)
@@ -221,12 +217,6 @@ def _sbm_density_matched(p: dict[str, object], seed: int):
 
 
 def _latent_corruption_recovery(p: dict[str, object], seed: int):
-    """Generate latent labels first, then corrupt the observed graph.
-
-    Unlike the legacy synthetic families, labels are never inferred from the
-    graph being evaluated.  This removes the circular advantage of the
-    original topology and turns the experiment into a recovery test.
-    """
     n = int(p["n"]); target_degree = float(p["target_avg_degree"])
     target_h = float(p["latent_homophily"]); q = float(p["corruption_fraction"])
     mode = str(p["corruption_mode"])
@@ -274,7 +264,6 @@ def _latent_corruption_recovery(p: dict[str, object], seed: int):
 
 
 def _apply_homophily_attack(graph: nx.Graph, labels: np.ndarray, fraction: float, rng: np.random.Generator) -> None:
-    """Replace same-class edges with cross-class nonedges at exact edge budget."""
     same = [(int(u), int(v)) for u, v in graph.edges() if labels[u] == labels[v]]
     requested = min(len(same), int(round(fraction * graph.number_of_edges())))
     if requested <= 0:
@@ -421,7 +410,6 @@ def _latent_hierarchical_recovery(p: dict[str, object], seed: int):
 
 
 def _degree_matched_bottleneck(p: dict[str, object], seed: int):
-    """Create two regular halves and add degree-preserving cross-edge swaps."""
     n = int(p["n"]); d = int(p["degree"]); requested = int(p["bridges"])
     half = n // 2
     left = nx.random_regular_graph(d, half, seed=seed)
@@ -457,7 +445,6 @@ def math_ceil_div(a: int, b: int) -> int:
 
 
 def _spectral_labels(graph: nx.Graph, classes: int, seed: int) -> np.ndarray:
-    """Create nontrivial topology-related labels without using node features."""
     n = graph.number_of_nodes()
     if n < classes:
         return np.arange(n, dtype=np.int64)
@@ -485,7 +472,6 @@ def _ensure_viable_labels(graph: nx.Graph, labels: np.ndarray, seed: int) -> np.
 
 
 def generate_tasks(graph: SyntheticGraph, cfg: TaskDesignConfig, master_seed: int) -> Iterable[SyntheticTask]:
-    """Generate independent feature realizations for a fixed labeled graph."""
     labels = graph.structural_labels.astype(np.int64, copy=True)
     if np.bincount(labels).min() < cfg.min_class_size:
         labels = _spectral_labels(graph.graph, 2, stable_seed(master_seed, graph.graph_id, "fallback_labels"))

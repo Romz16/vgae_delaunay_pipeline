@@ -1,12 +1,3 @@
-"""Modern PyTorch compatibility pilot for the IDGL graph-learning baseline.
-
-This is a documented compatibility port of IDGL's core ingredients (a
-multi-perspective weighted-cosine graph learner, skip connection to the observed
-adjacency, and a GCN trained jointly with the learned graph).  It deliberately
-uses the project's stratified 60/20/20 splits and chooses checkpoints by
-validation macro-F1 only.  It is a pilot, not a claim of bit-for-bit reproduction
-of the 2020 PyTorch-0.4 implementation.
-"""
 
 from __future__ import annotations
 
@@ -33,7 +24,6 @@ from src.data.splits import apply_node_split
 
 
 class WeightedCosineGraphLearner(nn.Module):
-    """The official IDGL weighted-cosine learner, expressed in current PyTorch."""
 
     def __init__(self, features: int, perspectives: int = 4) -> None:
         super().__init__()

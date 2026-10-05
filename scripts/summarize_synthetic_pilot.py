@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-"""Independent quantitative audit of the synthetic suitability pilot outputs."""
 
 from __future__ import annotations
 

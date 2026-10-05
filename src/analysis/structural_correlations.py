@@ -1,4 +1,3 @@
-"""Correlation and exploratory diagnostics for structural rewiring analysis."""
 
 from __future__ import annotations
 
@@ -22,7 +21,6 @@ PRIMARY_METRICS = [
 
 
 def safe_correlation(x, y):
-    """Return Pearson/Spearman correlations or None if unavailable."""
     frame = pd.DataFrame({"x": x, "y": y}).replace([np.inf, -np.inf], np.nan).dropna()
     if len(frame) < 3 or frame["x"].nunique() < 2 or frame["y"].nunique() < 2:
         return None
@@ -38,10 +36,6 @@ def safe_correlation(x, y):
 
 
 def dataset_level_gain(selected_runs: pd.DataFrame) -> pd.DataFrame:
-    """Aggregate validation-selected gains to dataset level.
-
-    The primary aggregation is the predeclared mean across backbones.
-    """
     if selected_runs.empty:
         return pd.DataFrame()
     per_backbone = (
@@ -67,7 +61,6 @@ def dataset_level_gain(selected_runs: pd.DataFrame) -> pd.DataFrame:
 
 
 def structural_metric_correlations(metrics_df: pd.DataFrame, selected_runs: pd.DataFrame) -> pd.DataFrame:
-    """Compute main dataset-level structural correlations."""
     dataset_gain = dataset_level_gain(selected_runs)
     if dataset_gain.empty or metrics_df.empty:
         return pd.DataFrame()
@@ -87,7 +80,6 @@ def structural_metric_correlations(metrics_df: pd.DataFrame, selected_runs: pd.D
 
 
 def leave_one_out_sensitivity(metrics_df: pd.DataFrame, selected_runs: pd.DataFrame) -> pd.DataFrame:
-    """Run leave-one-out sensitivity for primary structural correlations."""
     dataset_gain = dataset_level_gain(selected_runs)
     if dataset_gain.empty or metrics_df.empty:
         return pd.DataFrame()
@@ -128,7 +120,6 @@ def leave_one_out_sensitivity(metrics_df: pd.DataFrame, selected_runs: pd.DataFr
 
 
 def old_vs_corrected(old_correlations: pd.DataFrame | None, corrected: pd.DataFrame) -> pd.DataFrame:
-    """Compare preliminary and corrected structural correlations when old values exist."""
     if old_correlations is None or old_correlations.empty or corrected.empty:
         return pd.DataFrame(
             columns=[
@@ -181,7 +172,6 @@ def old_vs_corrected(old_correlations: pd.DataFrame | None, corrected: pd.DataFr
 
 
 def exploratory_recommendations(metrics_df: pd.DataFrame, dataset_gain: pd.DataFrame | None = None) -> pd.DataFrame:
-    """Produce descriptive, non-final rewiring recommendations."""
     original = metrics_df[metrics_df["graph_name"].eq("Original")].copy()
     if dataset_gain is not None and not dataset_gain.empty:
         original = original.merge(dataset_gain, on="dataset", how="left")
@@ -209,10 +199,6 @@ def exploratory_recommendations(metrics_df: pd.DataFrame, dataset_gain: pd.DataF
 
 
 def density_confounder_analysis(metrics_df: pd.DataFrame, selected_runs: pd.DataFrame) -> pd.DataFrame:
-    """Small exploratory analysis of density as a confounder.
-
-    Uses simple correlations only, because N=12 is too small for a rich model.
-    """
     dataset_gain = dataset_level_gain(selected_runs)
     original = metrics_df[metrics_df["graph_name"].eq("Original")].copy()
     merged = dataset_gain.merge(original, on="dataset", how="left")
@@ -258,7 +244,6 @@ def density_confounder_analysis(metrics_df: pd.DataFrame, selected_runs: pd.Data
 
 
 def baseline_saturation_analysis(metrics_df: pd.DataFrame, selected_runs: pd.DataFrame) -> pd.DataFrame:
-    """Correlate baseline performance with corrected rewiring gain."""
     dataset_gain = dataset_level_gain(selected_runs)
     if dataset_gain.empty:
         return pd.DataFrame()

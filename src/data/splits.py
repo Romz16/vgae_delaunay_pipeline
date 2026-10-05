@@ -1,4 +1,3 @@
-"""Train/validation/test masks for node classification."""
 
 from __future__ import annotations
 
@@ -11,18 +10,6 @@ from config import SplitConfig
 
 
 def apply_node_split(data: Data, seed: int, config: SplitConfig, device: torch.device) -> Data:
-    """Attach stratified train/validation/test masks to a PyG graph.
-
-    Args:
-        data: PyTorch Geometric graph with ``y`` labels.
-        seed: Random seed for the split.
-        config: Split configuration.
-        device: Target device for masks.
-
-    Returns:
-        The same graph object with ``train_mask``, ``val_mask`` and
-        ``test_mask`` attributes.
-    """
     if not hasattr(data, "y") or data.y is None:
         raise ValueError("Node labels `data.y` are required for node classification.")
 
@@ -72,11 +59,6 @@ def apply_nested_node_split(
     topology_val_size: float = 0.10,
     stratify: bool = True,
 ) -> Data:
-    """Attach disjoint train/inner-validation/topology-validation/test masks.
-
-    Fractions are relative to the complete node set. ``val_mask`` is retained
-    as an alias of ``inner_val_mask`` for compatibility with existing trainers.
-    """
     fractions = (test_size, inner_val_size, topology_val_size)
     if any(value <= 0.0 or value >= 1.0 for value in fractions):
         raise ValueError("All nested split fractions must be between 0 and 1.")

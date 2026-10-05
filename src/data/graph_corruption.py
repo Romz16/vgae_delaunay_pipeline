@@ -1,4 +1,3 @@
-"""Controlled perturbations for empirical graph experiments."""
 
 from __future__ import annotations
 
@@ -12,7 +11,6 @@ from torch_geometric.utils import remove_self_loops, to_undirected
 
 @dataclass(frozen=True)
 class CorruptedGraph:
-    """A perturbed graph and diagnostics relative to the clean original."""
 
     edge_index: torch.Tensor
     metadata: dict[str, object]
@@ -46,7 +44,6 @@ def corrupt_graph(
     seed: int,
     device: torch.device,
 ) -> CorruptedGraph:
-    """Perturb an empirical graph while keeping its nodes and edge budget fixed."""
     mode = mode.lower()
     if mode not in {"none", "degree_preserving", "homophily_attack"}:
         raise ValueError(f"Unknown corruption mode: {mode}")

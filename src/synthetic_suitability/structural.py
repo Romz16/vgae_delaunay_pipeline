@@ -1,4 +1,3 @@
-"""Label-free structural metrics for the prerewiring indicator."""
 
 from __future__ import annotations
 
@@ -20,7 +19,6 @@ INDICATOR_FORBIDDEN_COLUMNS = {
 
 
 def compute_prerewiring_metrics(graph: nx.Graph, cfg: MetricStudyConfig, seed: int) -> dict[str, float | int]:
-    """Compute metrics using only the original unlabeled topology."""
     graph = nx.convert_node_labels_to_integers(nx.Graph(graph), ordering="sorted")
     graph.remove_edges_from(nx.selfloop_edges(graph))
     n = graph.number_of_nodes(); m = graph.number_of_edges()

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Run protocol-matched SOTA baselines and Delaunay constructor controls."""
 
 from __future__ import annotations
 
@@ -62,7 +61,6 @@ def slug(name: str) -> str:
 
 
 def constructors_for_dataset(dataset: str) -> tuple[str, ...]:
-    """Return the preregistered lean control set for a dataset."""
     if dataset in REPRESENTATIVE_DATASETS:
         return PRIMARY_CONSTRUCTORS + EXTENDED_CONSTRUCTORS
     return PRIMARY_CONSTRUCTORS
@@ -70,7 +68,6 @@ def constructors_for_dataset(dataset: str) -> tuple[str, ...]:
 
 @contextmanager
 def dataset_phase_lock(output_root: Path, dataset: str, phase: str):
-    """Serialize any accidental overlap for the same dataset and phase."""
     lock_dir = output_root / ".locks"
     lock_dir.mkdir(parents=True, exist_ok=True)
     handle = (lock_dir / f"{slug(dataset)}_{phase}.lock").open("w", encoding="utf-8")

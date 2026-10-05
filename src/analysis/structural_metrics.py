@@ -1,18 +1,3 @@
-"""Structural graph metrics for rewiring diagnostics.
-
-The functions in this module are intentionally model-agnostic.  They operate
-on a PyG ``Data`` object or an ``edge_index`` and are designed to be called
-immediately after loading the original graph, before any rewiring is applied.
-
-Implemented metrics follow the revision protocol:
-- density, average degree, coefficient of variation of degree;
-- edge homophily, if labels are available;
-- normalized-Laplacian spectral gap lambda2;
-- Cheeger-related lower/upper bounds derived from lambda2;
-- approximate diameter and average shortest-path length on the largest CC;
-- sampled effective resistance;
-- component and isolate counts.
-"""
 
 from __future__ import annotations
 
@@ -31,7 +16,6 @@ from torch_geometric.data import Data
 
 @dataclass(frozen=True)
 class StructuralMetricConfig:
-    """Settings for approximate structural metrics."""
 
     seed: int = 42
     max_bfs_sources: int = 256
@@ -40,7 +24,6 @@ class StructuralMetricConfig:
 
 
 def clean_edge_index(edge_index: torch.Tensor, num_nodes: int) -> torch.Tensor:
-    """Return unique undirected non-self-loop edges with valid node ids."""
     edge_index = edge_index.detach().cpu().long()
     if edge_index.numel() == 0:
         return torch.empty((2, 0), dtype=torch.long)
@@ -63,7 +46,6 @@ def clean_edge_index(edge_index: torch.Tensor, num_nodes: int) -> torch.Tensor:
 
 
 def edge_index_to_networkx(edge_index: torch.Tensor, num_nodes: int) -> nx.Graph:
-    """Convert a PyG edge_index to an undirected NetworkX graph."""
     clean_edges = clean_edge_index(edge_index, num_nodes)
     graph = nx.Graph()
     graph.add_nodes_from(range(num_nodes))
@@ -73,7 +55,6 @@ def edge_index_to_networkx(edge_index: torch.Tensor, num_nodes: int) -> nx.Graph
 
 
 def edge_index_to_adjacency(edge_index: torch.Tensor, num_nodes: int) -> sp.csr_matrix:
-    """Build a symmetric scipy CSR adjacency matrix without self-loops."""
     clean_edges = clean_edge_index(edge_index, num_nodes)
     if clean_edges.numel() == 0:
         return sp.csr_matrix((num_nodes, num_nodes), dtype=np.float64)
@@ -90,7 +71,6 @@ def edge_index_to_adjacency(edge_index: torch.Tensor, num_nodes: int) -> sp.csr_
 
 
 def edge_homophily(edge_index: torch.Tensor, y: torch.Tensor | None, num_nodes: int) -> float:
-    """Compute edge homophily over unique undirected edges."""
     if y is None:
         return float("nan")
     y = y.detach().cpu().long()
@@ -102,7 +82,6 @@ def edge_homophily(edge_index: torch.Tensor, y: torch.Tensor | None, num_nodes: 
 
 
 def basic_metrics(graph: nx.Graph) -> dict[str, float | int]:
-    """Compute basic size, density and degree statistics."""
     n = graph.number_of_nodes()
     m = graph.number_of_edges()
     degrees = np.asarray([d for _, d in graph.degree()], dtype=np.float64)
@@ -127,7 +106,6 @@ def basic_metrics(graph: nx.Graph) -> dict[str, float | int]:
 
 
 def spectral_metrics(edge_index: torch.Tensor, num_nodes: int) -> dict[str, float | int]:
-    """Compute normalized-Laplacian lambda2 and Cheeger-related proxies."""
     adjacency = edge_index_to_adjacency(edge_index, num_nodes)
     if num_nodes < 3 or adjacency.nnz == 0:
         return {
@@ -168,7 +146,6 @@ def spectral_metrics(edge_index: torch.Tensor, num_nodes: int) -> dict[str, floa
 
 
 def largest_connected_component(graph: nx.Graph) -> nx.Graph:
-    """Return the largest connected component as a graph."""
     components = list(nx.connected_components(graph))
     if not components:
         return graph.copy()
@@ -176,7 +153,6 @@ def largest_connected_component(graph: nx.Graph) -> nx.Graph:
 
 
 def distance_metrics(graph: nx.Graph, max_sources: int, seed: int) -> dict[str, float]:
-    """Approximate diameter and average shortest-path length on largest CC."""
     rng = random.Random(seed)
     component = largest_connected_component(graph)
     nodes = list(component.nodes())
@@ -200,12 +176,6 @@ def distance_metrics(graph: nx.Graph, max_sources: int, seed: int) -> dict[str, 
 
 
 def effective_resistance_sample(edge_index: torch.Tensor, num_nodes: int, num_pairs: int, seed: int) -> dict[str, float | int]:
-    """Approximate average effective resistance over sampled node pairs.
-
-    The Laplacian is grounded by removing one non-isolated node.  This is an
-    exploratory approximation intended for cross-dataset comparison, not an
-    exact all-pairs effective-resistance computation.
-    """
     rng = np.random.default_rng(seed)
     adjacency = edge_index_to_adjacency(edge_index, num_nodes)
     if num_nodes < 3 or adjacency.nnz == 0:
@@ -262,7 +232,6 @@ def compute_structural_metrics(
     config: StructuralMetricConfig | None = None,
     edge_index: torch.Tensor | None = None,
 ) -> dict[str, object]:
-    """Compute all structural metrics for a graph condition."""
     cfg = config or StructuralMetricConfig()
     selected_edge_index = edge_index if edge_index is not None else data.edge_index
     selected_edge_index = selected_edge_index.detach().cpu().long()
@@ -303,7 +272,6 @@ def compute_structural_metrics(
 
 
 def save_structural_metrics(rows: list[dict[str, object]], path) -> pd.DataFrame:
-    """Save structural metric rows to CSV."""
     df = pd.DataFrame(rows)
     path = path if hasattr(path, "parent") else __import__("pathlib").Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -312,5 +280,4 @@ def save_structural_metrics(rows: list[dict[str, object]], path) -> pd.DataFrame
 
 
 def config_to_dict(config: StructuralMetricConfig) -> dict[str, object]:
-    """Return a JSON-serializable structural metric config."""
     return asdict(config)

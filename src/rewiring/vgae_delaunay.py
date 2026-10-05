@@ -1,4 +1,3 @@
-"""VGAE-guided rewiring over the DGlf Delaunay graph."""
 
 from __future__ import annotations
 
@@ -14,20 +13,8 @@ LOGGER = logging.getLogger("vgae_delaunay_pipeline.vgae_delaunay_rewiring")
 
 
 class VGAEDelaunayRewirer:
-    """Apply percentage-based VGAE rewiring to a Delaunay candidate graph.
-
-    This reproduces the experimental idea used previously: the base graph for
-    the rewired condition is the DGlf Delaunay graph. A ratio of 0% therefore
-    means a pure DGlf/Delaunay graph, not the original graph baseline.
-    """
 
     def __init__(self, add_self_loops: bool = True, device: torch.device | None = None) -> None:
-        """Initialize the rewirer.
-
-        Args:
-            add_self_loops: Whether to add self-loops after rewiring.
-            device: Target device.
-        """
         self.add_self_loops = add_self_loops
         self.device = device or torch.device("cpu")
 
@@ -38,17 +25,6 @@ class VGAEDelaunayRewirer:
         ratio: float,
         num_nodes: int,
     ) -> torch.Tensor:
-        """Remove low-similarity Delaunay edges and add high-similarity VGAE edges.
-
-        Args:
-            edge_index: DGlf/Delaunay edge index.
-            vgae_embeddings: VGAE embeddings with shape [num_nodes, dim].
-            ratio: Percentage of Delaunay edges to replace, in [0, 1].
-            num_nodes: Number of nodes.
-
-        Returns:
-            Rewired ``edge_index``.
-        """
         if not 0.0 <= ratio <= 1.0:
             raise ValueError("ratio precisa estar entre 0 e 1.")
         if vgae_embeddings.shape[0] != num_nodes:
@@ -78,7 +54,6 @@ class VGAEDelaunayRewirer:
         return self._finalize(new_edge_index, num_nodes)
 
     def _add_best_edges(self, graph: nx.Graph, sim_matrix: np.ndarray, k: int, num_nodes: int) -> int:
-        """Add up to k globally most similar non-existing edges."""
         flat = sim_matrix.reshape(-1)
         search_size = min(num_nodes * num_nodes, max(k * 10, (k + graph.number_of_edges()) * 3))
         candidate_ids = np.argpartition(flat, -search_size)[-search_size:]
@@ -95,7 +70,6 @@ class VGAEDelaunayRewirer:
         return added
 
     def _finalize(self, edge_index: torch.Tensor, num_nodes: int) -> torch.Tensor:
-        """Convert edge_index to undirected PyG format and optionally add self-loops."""
         edge_index = edge_index.long().contiguous()
         if self.add_self_loops:
             edge_index, _ = add_self_loops(edge_index, num_nodes=num_nodes)

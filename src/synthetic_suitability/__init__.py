@@ -1,4 +1,3 @@
-"""Controlled synthetic experiments for structural rewiring suitability."""
 
 from .config import SyntheticExperimentConfig, profile_config
 

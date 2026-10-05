@@ -1,4 +1,3 @@
-"""Cluster-safe analysis for the latent corruption/recovery experiment."""
 
 from __future__ import annotations
 

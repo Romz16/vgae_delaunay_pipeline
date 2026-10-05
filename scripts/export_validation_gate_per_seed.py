@@ -1,8 +1,3 @@
-"""Export leakage-safe per-run files for the exploratory 1 p.p. validation gate.
-
-The selector is reconstructed from validation columns only. Test F1 is joined
-only after the selected source row has been frozen.
-"""
 
 from __future__ import annotations
 

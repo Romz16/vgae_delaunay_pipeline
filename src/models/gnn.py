@@ -1,4 +1,3 @@
-"""Flexible node-classification GNN architectures."""
 
 from __future__ import annotations
 
@@ -12,7 +11,6 @@ from torch_geometric.nn import GATConv, GCNConv, SAGEConv
 
 @dataclass(frozen=True)
 class GNNParams:
-    """Hyperparameters for a GNN backbone."""
 
     hidden_channels: int
     n_layers: int
@@ -26,14 +24,6 @@ class GNNParams:
 
 
 def activation_fn(name: str) -> Callable[[torch.Tensor], torch.Tensor]:
-    """Return an activation function by name.
-
-    Args:
-        name: One of ``relu``, ``leaky_relu``, ``elu`` or ``gelu``.
-
-    Returns:
-        Callable activation function.
-    """
     key = name.lower()
     if key == "relu":
         return F.relu
@@ -47,11 +37,6 @@ def activation_fn(name: str) -> Callable[[torch.Tensor], torch.Tensor]:
 
 
 class FlexibleGNN(torch.nn.Module):
-    """Configurable GCN, GraphSAGE, GAT or residual GCN.
-
-    The class intentionally keeps a common interface for all backbones, which
-    makes the optimization and evaluation pipeline easier to extend.
-    """
 
     def __init__(
         self,
@@ -66,20 +51,6 @@ class FlexibleGNN(torch.nn.Module):
         heads: int | None = None,
         residual: bool = False,
     ) -> None:
-        """Initialize a flexible GNN.
-
-        Args:
-            kind: ``gcn``, ``sage`` or ``gat``.
-            in_channels: Number of input node features.
-            hidden_channels: Hidden dimensionality.
-            out_channels: Number of classes.
-            n_layers: Number of graph convolution layers.
-            dropout: Dropout probability.
-            activation: Activation function name.
-            batch_norm: Whether to use BatchNorm after hidden convolutions.
-            heads: Attention heads for GAT hidden layers.
-            residual: Whether to add residual connections when shapes match.
-        """
         super().__init__()
         if n_layers < 1:
             raise ValueError("n_layers precisa ser >= 1.")
@@ -108,16 +79,13 @@ class FlexibleGNN(torch.nn.Module):
         self.convs.append(self._make_conv(self._hidden_dim(hidden_channels), out_channels, is_last=True))
 
     def _hidden_dim(self, hidden_channels: int) -> int:
-        """Return hidden output dimension for the current backbone."""
         return hidden_channels * self.heads if self.kind == "gat" else hidden_channels
 
     @staticmethod
     def _make_norm(channels: int, batch_norm: bool) -> torch.nn.Module:
-        """Create a normalization module."""
         return torch.nn.BatchNorm1d(channels) if batch_norm else torch.nn.Identity()
 
     def _make_conv(self, in_channels: int, out_channels: int, is_last: bool) -> torch.nn.Module:
-        """Create one graph convolution layer."""
         if self.kind == "gcn":
             return GCNConv(in_channels, out_channels)
         if self.kind == "sage":
@@ -133,15 +101,6 @@ class FlexibleGNN(torch.nn.Module):
         edge_index: torch.Tensor,
         edge_weight: torch.Tensor | None = None,
     ) -> torch.Tensor:
-        """Run a forward pass.
-
-        Args:
-            x: Node feature matrix.
-            edge_index: Graph connectivity.
-
-        Returns:
-            Class logits for each node.
-        """
         if edge_weight is not None and self.kind != "gcn":
             raise ValueError("Edge weights are currently supported only by the protocol-matched GCN baseline.")
         for layer_idx, conv in enumerate(self.convs[:-1]):
@@ -162,18 +121,6 @@ def build_gnn(
     params: GNNParams,
     device: torch.device,
 ) -> FlexibleGNN:
-    """Build a GNN backbone from a symbolic name.
-
-    Args:
-        backbone: ``gcn``, ``gcn_residual``, ``sage`` or ``gat``.
-        in_channels: Number of input features.
-        out_channels: Number of output classes.
-        params: GNN hyperparameters.
-        device: Target device.
-
-    Returns:
-        Instantiated model on ``device``.
-    """
     normalized = backbone.lower()
     residual = normalized == "gcn_residual"
     kind = "gcn" if residual else normalized

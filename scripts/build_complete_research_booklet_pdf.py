@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Build the complete plain-language research booklet as a polished PDF."""
 
 from __future__ import annotations
 
@@ -236,7 +235,6 @@ def fmt_pct(value: float, digits=1) -> str:
 
 
 def save_bar_chart(labels, values, title, subtitle, filename, *, colors_by_sign=True, x_label="Ganho de macro-F1 (p.p.)"):
-    """Return a vector horizontal bar chart; filename is kept for call compatibility."""
     width, height = 475, max(245, 72 + 18 * len(labels))
     drawing = Drawing(width, height)
     drawing.add(String(8, height - 18, title, fontName="Arial-Bold", fontSize=12, fillColor=NAVY))
@@ -387,7 +385,6 @@ def build_story(st, data, charts):
     real, real_dataset, real_backbone, constructors_avg, sota_avg, nested_selected, nested_summary, nested_gain, synthetic_family, gate = data
     story = []
 
-    # Cover
     story += [Spacer(1, 2.0 * cm), HRFlowable(width="100%", thickness=5, color=TEAL), Spacer(1, 0.8 * cm)]
     story.append(p("Apostila completa do estudo de rewiring geométrico e híbrido", st["cover_title"]))
     story.append(p("Do primeiro protocolo em grafos reais aos controles, estudos sintéticos, validação cega e teste final com validações separadas", st["cover_sub"]))
@@ -406,7 +403,6 @@ def build_story(st, data, charts):
     story.append(data_table(["Item", "Descrição"], cover_rows, [3.1 * cm, 13.5 * cm], st, font_size=8.4, header_color=NAVY))
     story += [Spacer(1, 2.2 * cm), p("Documento técnico-didático. Todos os números apresentados foram recalculados ou conferidos nos CSVs consolidados do projeto.", st["small"]), PageBreak()]
 
-    # TOC
     story.append(heading("Sumário", st["h1"], 0))
     toc = TableOfContents()
     toc.levelStyles = [
@@ -416,7 +412,6 @@ def build_story(st, data, charts):
     story.append(toc)
     story.append(PageBreak())
 
-    # 1
     story.append(heading("1. O problema estudado", st["h1"], 0))
     story.append(p("Uma rede neural de grafos aprende combinando as features de cada nó com informações recebidas de seus vizinhos. Isso significa que as arestas não são apenas um desenho: elas definem quem troca informação com quem. Se o grafo observado estiver incompleto, ruidoso ou ligado por relações pouco úteis para a tarefa, a GNN pode aprender pior.", st["body"]))
     story.append(p("Rewiring é o processo de modificar essas conexões. O objetivo não é embelezar o grafo nem tornar todas as métricas estruturais maiores. O objetivo é criar vizinhanças que ajudem a classificação sem destruir conectividade importante.", st["body"]))
@@ -444,7 +439,6 @@ def build_story(st, data, charts):
     story.append(data_table(["Termo", "Explicação simples"], concepts, [3.2 * cm, 13.4 * cm], st, font_size=8.3))
     story.append(PageBreak())
 
-    # 2 pipeline
     story.append(heading("2. Como funciona o pipeline proposto", st["h1"], 0))
     story.append(flow_table(st))
     story.append(heading("2.1 Auxiliary GCN", st["h2"], 1))
@@ -466,7 +460,6 @@ def build_story(st, data, charts):
     story.append(heading("2.5 GNN downstream", st["h2"], 1))
     story.append(p("O grafo reconstruído não é avaliado pelo Auxiliary GCN. Ele é entregue a uma GNN final. GCN faz agregação normalizada, GAT aprende pesos de atenção e GraphSAGE agrega informações amostradas dos vizinhos. A interação entre o grafo e esse backbone foi uma das descobertas mais importantes.", st["body"]))
 
-    # 3 methodology
     story.append(PageBreak())
     story.append(heading("3. Metodologia experimental e decisões de justiça", st["h1"], 0))
     story.append(heading("3.1 Comparação pareada", st["h2"], 1))
@@ -496,7 +489,6 @@ def build_story(st, data, charts):
     ]
     story.append(data_table(["Métrica ou teste", "O que responde"], stats_rows, [4.0 * cm, 12.6 * cm], st, font_size=8.2))
 
-    # 4 metrics
     story.append(PageBreak())
     story.append(heading("4. Métricas estruturais explicadas", st["h1"], 0))
     metric_rows = [
@@ -516,7 +508,6 @@ def build_story(st, data, charts):
     story.append(data_table(["Métrica", "Definição simples", "Por que interessa"], metric_rows, [3.0 * cm, 6.1 * cm, 7.5 * cm], st, font_size=7.5))
     story.append(callout("Nenhuma dessas métricas, sozinha ou em combinação fixa, virou uma regra confiável de aplicação. Elas continuam úteis para explicar o que o rewiring fez e para levantar hipóteses.", st["callout"], PALE_ORANGE, ORANGE))
 
-    # 5 timeline
     story.append(PageBreak())
     story.append(heading("5. Evolução do estudo e das decisões", st["h1"], 0))
     timeline = [
@@ -532,7 +523,6 @@ def build_story(st, data, charts):
     ]
     story.append(data_table(["Etapa", "Pergunta", "Resultado", "Decisão"], timeline, [2.4 * cm, 4.2 * cm, 5.1 * cm, 4.9 * cm], st, font_size=7.2))
 
-    # 6 real data
     story.append(PageBreak())
     story.append(heading("6. Resultados nos 12 datasets reais", st["h1"], 0))
     story.append(p("O protocolo corrigido avaliou Actor, Airports-Brazil, Airports-Europe, Airports-USA, Amazon-Photo, Coauthor-CS, Cora, Cornell, Minesweeper, Pubmed, Roman-Empire e Texas. Foram três backbones e 100 seeds por combinação final.", st["body"]))
@@ -553,7 +543,6 @@ def build_story(st, data, charts):
         "A escolha do backbone não é detalhe: GCN e GAT responderam melhor que GraphSAGE em média.",
     ], st["bullet"])
 
-    # 7 structure
     story.append(PageBreak())
     story.append(heading("7. O que as métricas estruturais mostraram", st["h1"], 0))
     corr_rows = [
@@ -569,7 +558,6 @@ def build_story(st, data, charts):
     story.append(p("O Delaunay tendeu a tornar os grafos mais locais e agrupados. Ao mesmo tempo, reduziu conectividade global, aumentou caminhos e criou componentes adicionais. O VGAE recuperou parte dessas perdas. Isso explica por que aumentar clustering não significou automaticamente melhorar a classificação.", st["body"]))
     story.append(callout("Conclusão estrutural: um bom rewiring precisa preservar conectividade suficiente e, ao mesmo tempo, trocar arestas por relações mais úteis para a tarefa. Melhorar uma única métrica não basta.", st["callout"]))
 
-    # 8 constructors
     story.append(PageBreak())
     story.append(heading("8. Delaunay versus outros construtores", st["h1"], 0))
     story.append(charts["constructors"])
@@ -582,7 +570,6 @@ def build_story(st, data, charts):
     story.append(heading("8.1 Por que manter Delaunay na pesquisa", st["h2"], 1))
     story.append(p("Delaunay continua relevante porque oferece uma regra geométrica simples, local e sem um k fixo explícito. Além disso, raw-feature UMAP seguido de Delaunay foi forte no experimento de corrupção. O controle apenas corrige o alcance da tese: Delaunay é uma opção útil, não a única opção.", st["body"]))
 
-    # 9 SOTA
     story.append(PageBreak())
     story.append(heading("9. Comparação com SDRF e DiffWire CT", st["h1"], 0))
     story.append(p("Os valores antigos desses métodos vinham de execuções não totalmente compatíveis. Por isso SDRF e DiffWire CT foram reexecutados com os mesmos datasets, splits, seeds, seleção por validação, orçamento de tuning e avaliação final.", st["body"]))
@@ -593,7 +580,6 @@ def build_story(st, data, charts):
     story.append(data_table(["Método", "Backbone", "Ganho médio"], sota_rows, [6.0 * cm, 4.2 * cm, 6.4 * cm], st, font_size=8.3))
     story.append(p("DiffWire CT ficou levemente positivo no GCN. SDRF permaneceu próximo de zero ou negativo em média. O método proposto e os melhores construtores simples mostraram ganhos maiores em regimes específicos, mas a comparação deve considerar tempo, memória e o número de candidatos avaliados.", st["body"]))
 
-    # 10 synthetic
     story.append(PageBreak())
     story.append(heading("10. Primeiro estudo sintético", st["h1"], 0))
     story.append(p("Foram criados 205 grafos de seis famílias, 41 configurações, 1.230 tarefas e 24.600 condições de GNN. O objetivo era descobrir se propriedades do grafo original conseguiam prever sucesso antes do rewiring.", st["body"]))
@@ -609,7 +595,6 @@ def build_story(st, data, charts):
     story.append(heading("10.2 Por que os sintéticos pareciam contradizer as bases reais", st["h2"], 1))
     story.append(p("No primeiro desenho sintético, o grafo original já era uma topologia válida para a tarefa. Substituí-lo favorecia naturalmente o baseline. Em várias bases reais, a topologia pode ser incompleta ou pouco alinhada com as features. Essa diferença motivou o segundo desenho, com corrupção explícita.", st["body"]))
 
-    # 11 recovery
     story.append(PageBreak())
     story.append(heading("11. Experimento de corrupção e recuperação", st["h1"], 0))
     story.append(p("Nesse experimento, labels e features vieram de uma estrutura latente e o grafo observado foi corrompido depois. Assim, havia um defeito real que o rewiring poderia corrigir. Foram 180 grafos, 1.080 execuções aninhadas e 16.200 condições.", st["body"]))
@@ -636,7 +621,6 @@ def build_story(st, data, charts):
     story.append(data_table(["Indicador", "Resultado"], gate_rows, [9.0 * cm, 7.6 * cm], st, font_size=8.6, header_color=GREEN))
     story.append(callout("O gate é o resultado operacional mais forte: ele não tenta adivinhar uma regra universal. Ele aplica o rewiring somente quando a validação mostra vantagem suficiente.", st["callout"], PALE_GREEN, GREEN))
 
-    # 12 blind
     story.append(PageBreak())
     story.append(heading("12. Indicadores estruturais e validação cega", st["h1"], 0))
     story.append(p("Foram testadas métricas isoladas, regressões lineares, modelos não lineares e regras explícitas com condições E/OU. Depois, previsões foram congeladas para 96 grafos novos antes de revelar o resultado real.", st["body"]))
@@ -655,7 +639,6 @@ def build_story(st, data, charts):
     story.append(heading("12.1 O que ainda pode ser usado como indicador", st["h2"], 1))
     story.append(p("Densidade, lambda2, degree CV, homofilia, resistência e conectividade continuam sendo sinais exploratórios e explicativos. Eles podem compor uma análise, mas não devem substituir a validação do candidato. O melhor indicador disponível é o desempenho de validação obtido nas mesmas condições.", st["body"]))
 
-    # 13 latest nested
     story.append(PageBreak())
     story.append(heading("13. Teste mais recente: Auxiliary GCN e validações separadas", st["h1"], 0))
     story.append(p("Este foi o teste final solicitado para responder duas dúvidas específicas: o ganho viria apenas do encoder supervisionado? A reutilização da mesma validação poderia favorecer a escolha da topologia?", st["body"]))
@@ -707,7 +690,6 @@ def build_story(st, data, charts):
     story.append(p("Os ganhos em Roman-Empire com GAT e GCN permaneceram depois de separar checkpoint, escolha de topologia e teste. Isso fortalece a interpretação de que existe um efeito real em combinações específicas. Airports-USA ficou levemente positivo com GCN e GraphSAGE, porém os intervalos cruzaram zero; o ganho grande do protocolo anterior não se repetiu nesse piloto. Cora e Amazon-Photo permaneceram negativos.", st["body"]))
     story.append(p("Essa diferença não invalida o estudo anterior. O novo piloto mudou o tamanho da validação, reconstruiu a geometria por seed e usou 10 seeds em vez de 100. Ele mostra que a estimativa de ganho é sensível ao desenho de seleção, justamente a razão de separar as validações.", st["body"]))
 
-    # 14 conclusion thesis
     story.append(PageBreak())
     story.append(heading("14. Conclusões consolidadas", st["h1"], 0))
     conclusions = [
@@ -736,7 +718,6 @@ def build_story(st, data, charts):
         "Protocolo final com inner-validation e topology-validation distintas.",
     ], st["bullet"])
 
-    # 15 decision guide
     story.append(PageBreak())
     story.append(heading("15. Guia prático de decisão", st["h1"], 0))
     decision_rows = [
@@ -761,7 +742,6 @@ def build_story(st, data, charts):
     story.append(heading("15.2 O papel do custo", st["h2"], 1))
     story.append(p("Custo deve entrar na decisão porque SDRF, DiffWire, Auxiliary GCN, UMAP e VGAE não têm o mesmo tempo. Raw-feature kNN é atraente por evitar várias etapas. Os experimentos registraram tempos em parte das execuções, mas não instrumentaram wall-clock, RAM e VRAM de todos os métodos de forma uniforme. Portanto, a conclusão segura é de potencial menor complexidade operacional, não uma vantagem quantitativa fechada.", st["body"]))
 
-    # 16 strengths limitations stop rule
     story.append(PageBreak())
     story.append(heading("16. Pontos fortes, limites e regra de parada", st["h1"], 0))
     story.append(heading("16.1 Pontos fortes", st["h2"], 1))
@@ -795,7 +775,6 @@ def build_story(st, data, charts):
     ]
     story.append(data_table(stop_rows[0], stop_rows[1:], [6.0 * cm, 7.0 * cm, 3.6 * cm], st, font_size=7.8, header_color=ORANGE))
 
-    # 17 paper framing
     story.append(PageBreak())
     story.append(heading("17. Enquadramento recomendado para publicação", st["h1"], 0))
     story.append(p("A narrativa mais forte não é uma competição para provar que um único construtor vence sempre. É uma investigação sobre quando reconstruções task-informed ajudam, quais componentes produzem ou reparam o efeito e por que uma regra estática baseada somente na topologia falha.", st["body"]))
@@ -815,7 +794,6 @@ def build_story(st, data, charts):
     ]
     story.append(data_table(["Seção", "Conteúdo"], paper_rows, [4.2 * cm, 12.4 * cm], st, font_size=8.2))
 
-    # 18 reproducibility
     story.append(PageBreak())
     story.append(heading("18. Reprodutibilidade e arquivos de evidência", st["h1"], 0))
     story.append(p("Os números desta apostila vêm dos artefatos consolidados abaixo. CSVs long format preservam candidatos e seeds; CSVs wide preservam a seleção final pareada; relatórios Markdown registram decisões e interpretação.", st["body"]))
@@ -844,7 +822,6 @@ def build_story(st, data, charts):
         "Registrar tempo, RAM e VRAM se custo fizer parte da alegação.",
     ], st["bullet"])
 
-    # 19 glossary
     story.append(PageBreak())
     story.append(heading("19. Glossário rápido", st["h1"], 0))
     glossary = [
@@ -865,7 +842,6 @@ def build_story(st, data, charts):
     ]
     story.append(data_table(["Termo", "Significado"], glossary, [4.2 * cm, 12.4 * cm], st, font_size=8.1))
 
-    # Closing
     story.append(PageBreak())
     story.append(heading("20. Síntese final em uma página", st["h1"], 0))
     story.append(callout("O método funciona quando a reconstrução encontra relações úteis que o grafo original não expressa bem e preserva conectividade suficiente para a GNN downstream.", st["callout"], PALE_GREEN, GREEN))

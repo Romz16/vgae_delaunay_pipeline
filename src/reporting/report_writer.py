@@ -1,4 +1,3 @@
-"""Result consolidation and export."""
 
 from __future__ import annotations
 
@@ -11,7 +10,6 @@ from src.utils.metrics import format_metric
 
 
 class ReportWriter:
-    """Create CSV and Markdown reports in the experiment format."""
 
     @staticmethod
     def make_row(
@@ -19,7 +17,6 @@ class ReportWriter:
         rewiring: str,
         result: dict[str, Any],
     ) -> dict[str, Any]:
-        """Build one legacy result row for one graph condition."""
         acc = result["acc_summary"]
         f1 = result["f1_summary"]
         loss = result["loss_summary"]
@@ -47,7 +44,6 @@ class ReportWriter:
 
     @staticmethod
     def make_selected_summary_row(modelo: str, result: dict[str, Any]) -> dict[str, Any]:
-        """Build official validation-selected summary row."""
         baseline_acc = result["baseline_acc_summary"]
         baseline_f1 = result["baseline_f1_summary"]
         selected_acc = result["selected_acc_summary"]
@@ -81,7 +77,6 @@ class ReportWriter:
 
     @staticmethod
     def export(rows: list[dict[str, Any]], csv_path: Path, md_path: Path | None = None) -> pd.DataFrame:
-        """Export result rows to CSV and optionally Markdown."""
         csv_path.parent.mkdir(parents=True, exist_ok=True)
         df = pd.DataFrame(rows)
         df.to_csv(csv_path, index=False)

@@ -1,4 +1,3 @@
-"""End-to-end orchestration for VGAE + Delaunay rewiring experiments."""
 
 from __future__ import annotations
 
@@ -45,19 +44,6 @@ LOGGER = logging.getLogger("vgae_delaunay_pipeline.orchestrator")
 
 
 class VGAEDelaunayPipeline:
-    """Orchestrate the full scientific pipeline.
-
-    Corrected revision protocol:
-        1. Compute original structural metrics immediately after loading data.
-        2. Optimize/train VGAE and downstream GNN hyperparameters.
-        3. Build DGlf with auxiliary GCN -> UMAP -> Delaunay.
-        4. Generate all candidate rewired graphs.
-        5. For each dataset/backbone/seed, train all candidate rates, select
-           r* using validation F1 (or configured validation metric), and only
-           then record the selected test performance.
-        6. Export all per-run results, selected rates, paired tests and
-           structural diagnostics.
-    """
 
     def __init__(self, config: PipelineConfig, device: torch.device) -> None:
         self.config = config
@@ -65,7 +51,6 @@ class VGAEDelaunayPipeline:
         self.report_writer = ReportWriter()
 
     def run(self, data: Data) -> pd.DataFrame:
-        """Execute the pipeline and return the official selected-result DataFrame."""
         set_seed(self.config.base_seed)
         self._prepare_output_dirs()
         self._save_config()

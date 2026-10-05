@@ -1,4 +1,3 @@
-"""End-to-end smoke test for leakage-safe indicator fitting."""
 
 from __future__ import annotations
 

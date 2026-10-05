@@ -1,4 +1,3 @@
-"""Protocol-matched SDRF and scalable DiffWire-CT baselines."""
 
 from __future__ import annotations
 
@@ -28,7 +27,6 @@ def _edge_index(graph: nx.Graph) -> torch.Tensor:
 
 
 def balanced_forman(u: int, v: int, graph: nx.Graph) -> float:
-    """Balanced Forman curvature used by the authors' sparse SDRF reference."""
     di, dj = graph.degree(u), graph.degree(v)
     if di <= 1 or dj <= 1:
         return 0.0
@@ -65,7 +63,6 @@ def sdrf_snapshots(
     temperature: float = 5.0,
     removal_bound: float | None = None,
 ) -> dict[float, torch.Tensor]:
-    """Run one deterministic-seed sparse SDRF trajectory and retain snapshots."""
     random.seed(seed)
     rng = np.random.default_rng(seed)
     graph = nx.Graph()
@@ -147,12 +144,6 @@ def diffwire_ct_edge_weights(
     num_nodes: int,
     config: RewiringConfig,
 ) -> tuple[torch.Tensor, dict[str, object]]:
-    """Return spectral CT/effective-resistance weights aligned to edge_index.
-
-    This is the scalable static CTE realization of DiffWire's CT relevance
-    matrix.  It avoids the official dense N-by-N differentiable layer, which is
-    not computationally viable for the largest protocol datasets.
-    """
     clean = to_undirected(remove_self_loops(edge_index.detach().cpu())[0], num_nodes=num_nodes)
     model = EffectiveResistanceScorer(config).fit(clean, num_nodes)
     pairs = clean.t().numpy().astype(np.int64)

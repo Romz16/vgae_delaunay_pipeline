@@ -1,4 +1,3 @@
-"""Optuna optimization for VGAE embeddings."""
 
 from __future__ import annotations
 
@@ -18,27 +17,12 @@ LOGGER = logging.getLogger("vgae_delaunay_pipeline.vgae_optimizer")
 
 
 class VGAEOptimizer:
-    """Optimize VGAE hyperparameters using link-prediction validation."""
 
     def __init__(self, config: PipelineConfig, device: torch.device) -> None:
-        """Initialize the optimizer.
-
-        Args:
-            config: Global pipeline configuration.
-            device: Target device.
-        """
         self.config = config
         self.device = device
 
     def optimize(self, data: Data) -> VGAEParams:
-        """Run Optuna and return the best VGAE parameters.
-
-        Args:
-            data: Input graph.
-
-        Returns:
-            Best VGAE hyperparameters found by Optuna.
-        """
         LOGGER.info("Iniciando busca de hiperparâmetros para VGAE...")
         sampler = optuna.samplers.TPESampler(
             seed=self.config.base_seed,
@@ -59,7 +43,6 @@ class VGAEOptimizer:
         return self._params_from_trial_dict(study.best_params)
 
     def _objective(self, trial: optuna.Trial, data: Data) -> float:
-        """Optuna objective using validation AUC/AP."""
         params = VGAEParams(
             hidden_channels=trial.suggest_categorical("hidden_channels", [32, 64, 128, 256]),
             latent_channels=trial.suggest_categorical("latent_channels", [16, 32, 64, 128]),
@@ -116,7 +99,6 @@ class VGAEOptimizer:
 
     @staticmethod
     def _params_from_trial_dict(params: dict[str, object]) -> VGAEParams:
-        """Convert Optuna params into a typed dataclass."""
         return VGAEParams(
             hidden_channels=int(params["hidden_channels"]),
             latent_channels=int(params["latent_channels"]),

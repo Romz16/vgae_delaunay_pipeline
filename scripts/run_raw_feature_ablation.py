@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Backfill the Raw features -> UMAP -> Delaunay ablation for a completed run."""
 
 from __future__ import annotations
 

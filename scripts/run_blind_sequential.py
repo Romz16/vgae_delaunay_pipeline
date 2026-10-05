@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-"""Frozen-prediction sequential validation for rewiring suitability."""
 
 from __future__ import annotations
 

@@ -1,4 +1,3 @@
-"""Optuna optimization for node-classification GNN backbones."""
 
 from __future__ import annotations
 
@@ -16,45 +15,19 @@ LOGGER = logging.getLogger("vgae_delaunay_pipeline.gnn_optimizer")
 
 
 class GNNOptimizer:
-    """Optimize GNN hyperparameters using validation performance."""
 
     def __init__(self, config: PipelineConfig, device: torch.device) -> None:
-        """Initialize the optimizer.
-
-        Args:
-            config: Global pipeline configuration.
-            device: Target device.
-        """
         self.config = config
         self.device = device
         self.trainer = GNNTrainer(config, device)
 
     def optimize_all(self, data: Data, edge_index: torch.Tensor) -> dict[str, GNNParams]:
-        """Optimize all configured backbones.
-
-        Args:
-            data: Input graph.
-            edge_index: Edge index used during hyperparameter search.
-
-        Returns:
-            Mapping from backbone name to optimized hyperparameters.
-        """
         best: dict[str, GNNParams] = {}
         for backbone in self.config.backbones:
             best[backbone] = self.optimize_one(data, edge_index, backbone)
         return best
 
     def optimize_one(self, data: Data, edge_index: torch.Tensor, backbone: str) -> GNNParams:
-        """Optimize one GNN backbone.
-
-        Args:
-            data: Input graph.
-            edge_index: Edge index used for message passing during search.
-            backbone: Backbone name.
-
-        Returns:
-            Best hyperparameter configuration.
-        """
         LOGGER.info("Iniciando busca de hiperparâmetros para %s...", backbone.upper())
         sampler = optuna.samplers.TPESampler(
             seed=self.config.base_seed,
@@ -75,7 +48,6 @@ class GNNOptimizer:
         return self._params_from_trial_dict(study.best_params, backbone)
 
     def _objective(self, trial: optuna.Trial, data: Data, edge_index: torch.Tensor, backbone: str) -> float:
-        """Optuna objective for one GNN backbone."""
         params = GNNParams(
             hidden_channels=trial.suggest_categorical("hidden_channels", [32, 64, 128, 256]),
             n_layers=trial.suggest_int("n_layers", 2, 4),
@@ -104,7 +76,6 @@ class GNNOptimizer:
 
     @staticmethod
     def _params_from_trial_dict(params: dict[str, object], backbone: str) -> GNNParams:
-        """Convert Optuna params into a typed dataclass."""
         return GNNParams(
             hidden_channels=int(params["hidden_channels"]),
             n_layers=int(params["n_layers"]),

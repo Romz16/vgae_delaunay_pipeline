@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Validate the corrected 12-dataset revision delivery."""
 
 from __future__ import annotations
 

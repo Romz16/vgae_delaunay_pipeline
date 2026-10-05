@@ -1,4 +1,3 @@
-"""Dataset and graph-file loading utilities."""
 
 from __future__ import annotations
 
@@ -33,33 +32,12 @@ from src.data.graph_utils import networkx_to_pyg, normalize_pyg_data
 
 
 class GraphLoader:
-    """Load graphs from PyG dataset names or local files.
-
-    The pipeline expects a PyG ``Data`` object with ``edge_index``, ``x`` and
-    ``y``. For files without features, simple degree-based features are created
-    later by the graph normalization step.
-    """
 
     def __init__(self, root: str | Path = "./data", device: torch.device | None = None) -> None:
-        """Initialize the loader.
-
-        Args:
-            root: Root directory used by PyG datasets.
-            device: Target PyTorch device.
-        """
         self.root = Path(root)
         self.device = device or torch.device("cpu")
 
     def load_from_name(self, name: str) -> Data:
-        """Load a supported PyG dataset by name.
-
-        Args:
-            name: Dataset identifier, such as ``Cora``, ``Wisconsin``,
-                ``LastFMAsia``, ``Roman-empire`` or ``Airports-Brazil``.
-
-        Returns:
-            Normalized PyG graph.
-        """
         key = name.lower().replace("_", "-")
         transform = NormalizeFeatures()
 
@@ -107,22 +85,6 @@ class GraphLoader:
         return normalize_pyg_data(dataset[0], self.device)
 
     def load_from_file(self, path: str | Path, file_format: str | None = None) -> Data:
-        """Load a graph from a local file.
-
-        Supported formats:
-            - ``.pt``/``.pth``: saved PyG ``Data`` or dict with tensors.
-            - ``.npz``: arrays ``edge_index``, ``x`` and ``y``.
-            - ``.csv``: edge list with columns source,target; optional label file
-              is not inferred automatically.
-            - ``.graphml``, ``.gexf``, ``.gpickle``: NetworkX graphs.
-
-        Args:
-            path: Input graph path.
-            file_format: Optional explicit format string.
-
-        Returns:
-            Normalized PyG graph.
-        """
         path = Path(path)
         fmt = (file_format or path.suffix.lstrip(".")).lower()
         if not path.exists():
@@ -148,7 +110,6 @@ class GraphLoader:
 
     @staticmethod
     def _from_torch_object(obj: Any) -> Data:
-        """Convert a Torch-loaded object to PyG Data."""
         if isinstance(obj, Data):
             return obj
         if isinstance(obj, dict):
@@ -162,7 +123,6 @@ class GraphLoader:
 
     @staticmethod
     def _from_npz(path: Path) -> Data:
-        """Load a PyG graph from an NPZ file."""
         arrays = np.load(path, allow_pickle=True)
         edge_index = torch.as_tensor(arrays["edge_index"], dtype=torch.long)
         x = torch.as_tensor(arrays["x"], dtype=torch.float32) if "x" in arrays else None
@@ -172,12 +132,6 @@ class GraphLoader:
 
     @staticmethod
     def _from_edge_csv(path: Path) -> Data:
-        """Load an edge-list CSV.
-
-        The CSV must contain ``source`` and ``target`` columns. For supervised
-        node classification, labels still need to be added in a .pt/.npz file;
-        this option is mainly useful for quick structural experiments.
-        """
         df = pd.read_csv(path)
         if not {"source", "target"}.issubset(df.columns):
             raise ValueError("CSV precisa conter colunas `source` e `target`.")

@@ -1,4 +1,3 @@
-"""Protocol-matched graph-constructor controls on shared 2-D coordinates."""
 
 from __future__ import annotations
 
@@ -77,7 +76,6 @@ def build_constructor_controls(
     *,
     seed: int,
 ) -> dict[str, ConstructorResult]:
-    """Build edge-budget-matched controls from the same auxiliary-GCN UMAP points."""
     points = np.asarray(points, dtype=np.float64)
     n = len(points)
     delaunay_pairs = _pairs_from_edge_index(delaunay_edge_index)

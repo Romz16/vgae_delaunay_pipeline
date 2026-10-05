@@ -1,13 +1,4 @@
 #!/usr/bin/env python3
-"""Aggregate outputs_revision folders across datasets.
-
-Use after running the corrected pipeline for all datasets. The script scans an
-output root, combines per-dataset CSVs, and recomputes dataset-level structural
-correlations with N equal to the number of datasets found.
-
-Example:
-    python scripts/aggregate_revision_outputs.py --root outputs --out outputs_revision_global
-"""
 
 from __future__ import annotations
 
@@ -65,7 +56,6 @@ def collect_csv(
 
 
 def selected_before_after(metrics: pd.DataFrame, selected: pd.DataFrame) -> pd.DataFrame:
-    """Attach original/selected structural metrics and deltas to every selected seed."""
     if metrics.empty or selected.empty or "selected_condition" not in selected.columns:
         return pd.DataFrame()
     metric_columns = [
@@ -110,7 +100,6 @@ def selected_before_after(metrics: pd.DataFrame, selected: pd.DataFrame) -> pd.D
 
 
 def delta_correlations(before_after: pd.DataFrame) -> pd.DataFrame:
-    """Correlate dataset-level structural changes with corrected test gain."""
     if before_after.empty:
         return pd.DataFrame()
     delta_columns = [column for column in before_after.columns if column.startswith("delta_")]
@@ -126,7 +115,6 @@ def delta_correlations(before_after: pd.DataFrame) -> pd.DataFrame:
 
 
 def raw_feature_comparison(raw_runs: pd.DataFrame, selected: pd.DataFrame) -> pd.DataFrame:
-    """Pair Raw-feature Delaunay runs with the original baseline on identical seeds."""
     if raw_runs.empty or selected.empty:
         return pd.DataFrame()
     baseline_columns = [
@@ -144,7 +132,6 @@ def raw_feature_comparison(raw_runs: pd.DataFrame, selected: pd.DataFrame) -> pd
 
 
 def write_global_figures(metrics: pd.DataFrame, selected: pd.DataFrame, before_after: pd.DataFrame, figures_dir: Path) -> None:
-    """Write the predeclared global structural figures."""
     try:
         import matplotlib.pyplot as plt
     except Exception:

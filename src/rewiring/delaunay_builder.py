@@ -1,4 +1,3 @@
-"""DGlf construction: auxiliary GCN, UMAP projection and Delaunay graph."""
 
 from __future__ import annotations
 
@@ -26,52 +25,32 @@ LOGGER = logging.getLogger("vgae_delaunay_pipeline.delaunay_builder")
 
 
 class AuxiliaryGCN(torch.nn.Module):
-    """Small supervised GCN used to extract learned features for DGlf."""
 
     def __init__(self, in_channels: int, hidden_channels: int, out_channels: int) -> None:
-        """Initialize the auxiliary GCN."""
         super().__init__()
         self.conv1 = GCNConv(in_channels, hidden_channels)
         self.conv2 = GCNConv(hidden_channels, out_channels)
 
     def forward(self, x: torch.Tensor, edge_index: torch.Tensor) -> torch.Tensor:
-        """Return class logits."""
         x = F.relu(self.conv1(x, edge_index))
         x = F.dropout(x, p=0.5, training=self.training)
         return self.conv2(x, edge_index)
 
     def get_embeddings(self, x: torch.Tensor, edge_index: torch.Tensor) -> torch.Tensor:
-        """Return first-layer learned features."""
         return F.relu(self.conv1(x, edge_index))
 
 
 class DelaunayGraphBuilder:
-    """Build a Delaunay graph from GCN learned features projected with UMAP."""
 
     def __init__(self, config: PipelineConfig, device: torch.device) -> None:
-        """Initialize the builder.
-
-        Args:
-            config: Global pipeline configuration.
-            device: Target device.
-        """
         self.config = config
         self.device = device
 
     def build(self, data: Data) -> torch.Tensor:
-        """Build the DGlf Delaunay graph.
-
-        Args:
-            data: Graph with train/validation masks already attached.
-
-        Returns:
-            Delaunay graph as PyG ``edge_index``.
-        """
         edge_index, _, _ = self.build_with_projection(data)
         return edge_index
 
     def build_with_projection(self, data: Data) -> tuple[torch.Tensor, np.ndarray, np.ndarray]:
-        """Build DGlf and return edge_index, learned features and UMAP points."""
         LOGGER.info("Treinando GCN auxiliar para extrair learned features DGlf...")
         learned_features = self._extract_learned_features(data)
         LOGGER.info("Projetando learned features com UMAP...")
@@ -88,7 +67,6 @@ class DelaunayGraphBuilder:
         validation_mask: torch.Tensor | None = None,
         selection_metric: str = "f1",
     ) -> tuple[AuxiliaryGCN, dict[str, float]]:
-        """Fit the feature encoder and expose its classifier-only baseline."""
         if seed is not None:
             set_seed(seed)
         train_mask = data.train_mask if train_mask is None else train_mask
@@ -163,7 +141,6 @@ class DelaunayGraphBuilder:
     def build_from_auxiliary_model(
         self, data: Data, model: AuxiliaryGCN
     ) -> tuple[torch.Tensor, np.ndarray, np.ndarray]:
-        """Build Delaunay from a previously selected auxiliary checkpoint."""
         model.eval()
         with torch.no_grad():
             features = model.get_embeddings(data.x, data.edge_index)
@@ -173,19 +150,16 @@ class DelaunayGraphBuilder:
         return edge_index, learned_features, points_2d
 
     def build_from_raw_features(self, data: Data) -> torch.Tensor:
-        """Build a raw-feature UMAP -> Delaunay baseline graph."""
         edge_index, _, _ = self.build_from_raw_features_with_projection(data)
         return edge_index
 
     def build_from_raw_features_with_projection(self, data: Data) -> tuple[torch.Tensor, np.ndarray, np.ndarray]:
-        """Build the raw-feature baseline and return its features and UMAP points."""
         features = data.x.detach().cpu().numpy().astype(np.float32, copy=False)
         points_2d = self._project_umap(features)
         edge_index = self._build_delaunay_edges(points_2d, data.num_nodes)
         return edge_index, features, points_2d
 
     def umap_trustworthiness(self, original_features: np.ndarray, points_2d: np.ndarray) -> float:
-        """Compute UMAP trustworthiness between high-dimensional features and 2D projection."""
         n_samples = int(original_features.shape[0])
         max_samples = int(self.config.delaunay.trustworthiness_max_samples)
         if n_samples > max_samples:
@@ -199,7 +173,6 @@ class DelaunayGraphBuilder:
         return float(trustworthiness(original_features, points_2d, n_neighbors=n_neighbors))
 
     def _extract_learned_features(self, data: Data) -> np.ndarray:
-        """Train the auxiliary GCN and extract hidden representations."""
         model, metrics = self.fit_auxiliary_gcn(data, selection_metric="acc")
         LOGGER.info("GCN auxiliar concluída | Val Acc: %.4f", metrics["inner_val_acc"])
         model.eval()
@@ -208,7 +181,6 @@ class DelaunayGraphBuilder:
         return features.detach().cpu().numpy().astype(np.float32, copy=False)
 
     def _project_umap(self, features: np.ndarray) -> np.ndarray:
-        """Project features to two dimensions using UMAP."""
         reducer = umap.UMAP(
             n_components=self.config.delaunay.umap_components,
             n_neighbors=self.config.delaunay.umap_neighbors,
@@ -218,7 +190,6 @@ class DelaunayGraphBuilder:
         return reducer.fit_transform(features)
 
     def _build_delaunay_edges(self, points_2d: np.ndarray, num_nodes: int) -> torch.Tensor:
-        """Build a Delaunay edge_index from 2D points."""
         if points_2d.shape[1] != 2:
             raise ValueError("Delaunay exige projeção 2D.")
         try:
@@ -243,6 +214,5 @@ class DelaunayGraphBuilder:
 
     @staticmethod
     def _simplex_pairs(simplex: Iterable[int]) -> list[tuple[int, int]]:
-        """Return undirected edge pairs for a triangle simplex."""
         s = list(simplex)
         return [(s[0], s[1]), (s[1], s[2]), (s[2], s[0])]

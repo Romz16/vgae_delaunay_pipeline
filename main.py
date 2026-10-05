@@ -1,17 +1,3 @@
-"""CLI entry point for the VGAE + Delaunay rewiring pipeline.
-
-Examples:
-    Run with a PyG dataset import:
-        python main.py --dataset Cora --root ./data --output-dir outputs/cora
-
-    Run with a local PyG .pt graph:
-        python main.py --graph-file ./my_graph.pt --dataset MyGraph --output-dir outputs/my_graph
-
-    Faster smoke test:
-        python main.py --dataset Wisconsin --vgae-trials 3 --gnn-trials 3 \
-            --final-runs 2 --gnn-opt-epochs 20 --gnn-final-epochs 20 \
-            --vgae-opt-epochs 20 --vgae-final-epochs 20
-"""
 
 from __future__ import annotations
 
@@ -35,11 +21,6 @@ from src.utils.logging_utils import configure_logging
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse CLI arguments.
-
-    Returns:
-        Parsed command-line arguments.
-    """
     parser = argparse.ArgumentParser(description="Pipeline VGAE + DGlf/Delaunay Rewiring")
     input_group = parser.add_mutually_exclusive_group(required=True)
     input_group.add_argument("--dataset", type=str, help="Nome de dataset suportado pelo loader PyG.")
@@ -124,14 +105,6 @@ def parse_args() -> argparse.Namespace:
 
 
 def build_config(args: argparse.Namespace) -> PipelineConfig:
-    """Build a PipelineConfig from CLI arguments.
-
-    Args:
-        args: Parsed CLI arguments.
-
-    Returns:
-        Pipeline configuration.
-    """
     dataset_name = args.dataset_name or args.dataset or Path(args.graph_file).stem
     output = OutputConfig(root_dir=Path(args.output_dir))
     optuna = OptunaConfig(
@@ -171,7 +144,6 @@ def build_config(args: argparse.Namespace) -> PipelineConfig:
 
 
 def main() -> None:
-    """Load a graph and run the full pipeline."""
     args = parse_args()
     level = getattr(logging, args.log_level.upper(), logging.INFO)
     logger = configure_logging(level)

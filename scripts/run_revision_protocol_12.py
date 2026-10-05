@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Run the corrected N=12 protocol sequentially with durable per-dataset logs."""
 
 from __future__ import annotations
 

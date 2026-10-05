@@ -1,4 +1,3 @@
-"""Statistical tests for validation-selected rewiring results."""
 
 from __future__ import annotations
 
@@ -8,11 +7,6 @@ from scipy import stats
 
 
 def paired_test_rows(selected_runs: pd.DataFrame) -> pd.DataFrame:
-    """Compute paired tests between baseline and selected rewiring per dataset/backbone.
-
-    Expected columns include dataset, backbone, seed, baseline_test_f1 and
-    selected_test_f1. Values are assumed to be in [0, 1].
-    """
     if selected_runs.empty:
         return pd.DataFrame()
 

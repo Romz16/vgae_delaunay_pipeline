@@ -1,14 +1,3 @@
-"""Scalable IDGL-anchor compatibility baseline for the project protocol.
-
-This uses IDGL's node-to-anchor weighted-cosine graph learner and its
-node-anchor-node message passing.  It avoids an N x N learned adjacency, so it
-can be run on every benchmark in this repository.  Splits and early stopping
-are exactly the project stratified 60/20/20 protocol; the output keeps val/test
-per seed so an original-vs-IDGL fallback can be selected by validation only.
-
-It is a modern-PyTorch compatibility implementation, not a byte-identical run
-of the legacy IDGL release (PyTorch 0.4).  Results must carry that label.
-"""
 
 from __future__ import annotations
 
@@ -35,7 +24,6 @@ from src.data.splits import apply_node_split
 
 
 class AnchorWeightedCosine(nn.Module):
-    """IDGL AnchorGraphLearner's weighted-cosine score, with top-k sparsity."""
 
     def __init__(self, features: int, perspectives: int, topk: int) -> None:
         super().__init__()
@@ -54,7 +42,6 @@ class AnchorWeightedCosine(nn.Module):
 
 
 def anchor_propagate(x: torch.Tensor, node_anchor: torch.Tensor, layer: nn.Linear) -> torch.Tensor:
-    """The node-anchor-node normalization used by IDGL's AnchorGCN layer."""
     support = layer(x)
     node_to_anchor = node_anchor / node_anchor.sum(dim=0, keepdim=True).clamp_min(1e-12)
     anchor_to_node = node_anchor / node_anchor.sum(dim=1, keepdim=True).clamp_min(1e-12)

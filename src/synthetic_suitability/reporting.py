@@ -1,4 +1,3 @@
-"""Paper-ready figures, tables, and academic text for the synthetic study."""
 
 from __future__ import annotations
 
@@ -12,7 +11,6 @@ from .config import SyntheticExperimentConfig
 
 
 def generate_outputs(config: SyntheticExperimentConfig) -> None:
-    """Generate requested figures, tables, and manuscript subsections."""
     try:
         import matplotlib.pyplot as plt
         import seaborn as sns

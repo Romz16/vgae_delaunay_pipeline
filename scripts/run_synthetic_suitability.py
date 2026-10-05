@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-"""CLI for the controlled synthetic rewiring suitability study."""
 
 from __future__ import annotations
 

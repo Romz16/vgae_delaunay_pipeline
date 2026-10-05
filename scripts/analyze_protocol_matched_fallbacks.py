@@ -1,12 +1,3 @@
-"""Apply an equivalent validation fallback to original for all compared methods.
-
-No model is retrained.  Each row's test value remains hidden until a candidate
-has been selected by validation macro-F1.  The same rule is applied to:
-
-* proposed DGlf + VGAE candidates versus the original graph;
-* SDRF snapshots, with the common saved original baseline added explicitly;
-* DiffWire CT versus the original graph.
-"""
 
 from __future__ import annotations
 
@@ -35,7 +26,6 @@ def original_rows(main: pd.DataFrame) -> pd.DataFrame:
 
 
 def choose_by_validation(rows: pd.DataFrame, method: str) -> pd.DataFrame:
-    """Select on validation only, preferring original in an exact validation tie."""
     frame = rows.copy()
     frame["is_original"] = frame["candidate"].eq("original")
     frame = frame.sort_values(KEYS + ["val_f1", "is_original", "ratio"],

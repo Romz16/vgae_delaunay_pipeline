@@ -1,10 +1,3 @@
-"""Execution engine for controlled rewiring experiments.
-
-The module deliberately keeps graph generation, task generation, pipeline
-evaluation, and indicator fitting in separate artifacts. Test outcomes are
-written only as targets and are never merged into the prerewiring feature set
-used by the indicator.
-"""
 
 from __future__ import annotations
 
@@ -23,7 +16,6 @@ from .structural import compute_prerewiring_metrics
 
 
 def graph_catalog(config: SyntheticExperimentConfig, overwrite: bool = False) -> pd.DataFrame:
-    """Generate graph-level prerewiring metrics without labels or model results."""
     output = config.output_dir / "synthetic_graph_metrics.csv"
     if output.exists() and not overwrite:
         return pd.read_csv(output)
@@ -59,7 +51,6 @@ def run_experiments(
     num_shards: int = 1,
     finalize: bool = True,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Run all graph, task, and pipeline seeds with resumable part files."""
     if num_shards < 1:
         raise ValueError("num_shards must be at least 1")
     if not 0 <= shard_index < num_shards:
@@ -110,7 +101,6 @@ def evaluate_one(
     pipeline_seed: int,
     config: SyntheticExperimentConfig,
 ) -> tuple[list[dict[str, object]], dict[str, object], list[dict[str, object]]]:
-    """Evaluate original, geometry, VGAE refinement, and constructor controls."""
     import torch
     from torch_geometric.data import Data
     from torch_geometric.utils import from_networkx, to_undirected
@@ -333,7 +323,6 @@ def _mechanism_rows(synthetic, task, pipeline_seed, num_nodes, original_edges, g
 
 
 def aggregate_outcomes(config: SyntheticExperimentConfig) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Aggregate seeds at graph level and configuration level."""
     selected = pd.read_csv(config.output_dir / "selected_execution_results.csv")
     metrics = pd.read_csv(config.output_dir / "synthetic_graph_metrics.csv")
     graph_outcomes = selected.groupby(["graph_id", "family", "configuration_id"], as_index=False).agg(
@@ -384,7 +373,6 @@ def aggregate_outcomes(config: SyntheticExperimentConfig) -> tuple[pd.DataFrame,
 
 
 def design_summary(config: SyntheticExperimentConfig) -> dict[str, int | str]:
-    """Return and persist the exact factorial workload before execution."""
     from .generation import configuration_grid
     configurations = len(configuration_grid(config.graph))
     graphs = configurations * config.graph.instances_per_configuration

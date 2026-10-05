@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Build an expanded, plain-language defense manual for the rewiring study."""
 
 from __future__ import annotations
 

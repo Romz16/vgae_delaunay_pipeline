@@ -1,4 +1,3 @@
-"""Scientific invariants for the synthetic suitability study."""
 
 from __future__ import annotations
 

@@ -1,4 +1,3 @@
-"""Configuration and preregistered profiles for the synthetic study."""
 
 from __future__ import annotations
 
@@ -10,13 +9,6 @@ import json
 
 @dataclass(frozen=True)
 class GraphDesignConfig:
-    """Factorial graph-generation design.
-
-    Each family exposes a small number of interpretable structural controls.
-    Several sweeps hold node count and expected edge budget fixed so that the
-    effect of bottlenecks, path length, or degree heterogeneity is not reduced
-    to a density comparison.
-    """
 
     node_counts: tuple[int, ...] = (240, 480)
     families: tuple[str, ...] = (
@@ -46,7 +38,6 @@ class GraphDesignConfig:
 
 @dataclass(frozen=True)
 class TaskDesignConfig:
-    """Controlled node-classification tasks attached to every graph."""
 
     feature_regimes: tuple[str, ...] = ("informative", "partial", "noisy")
     feature_dimensions: int = 24
@@ -61,7 +52,6 @@ class TaskDesignConfig:
 
 @dataclass(frozen=True)
 class PipelineStudyConfig:
-    """Fixed pipeline settings shared by every synthetic condition."""
 
     pipeline_seeds_per_task: int = 3
     pipeline_seed_start: int = 41000
@@ -88,7 +78,6 @@ class PipelineStudyConfig:
 
 @dataclass(frozen=True)
 class MetricStudyConfig:
-    """Pre-rewiring structural metric settings."""
 
     bfs_sources: int = 128
     resistance_pairs: int = 64
@@ -99,7 +88,6 @@ class MetricStudyConfig:
 
 @dataclass(frozen=True)
 class IndicatorStudyConfig:
-    """Leakage-safe indicator fitting and evaluation settings."""
 
     success_thresholds_pp: tuple[float, ...] = (0.0, 0.5, 1.0)
     primary_success_threshold_pp: float = 0.5
@@ -150,7 +138,6 @@ class IndicatorStudyConfig:
 
 @dataclass(frozen=True)
 class SyntheticExperimentConfig:
-    """Complete, serializable study configuration."""
 
     profile: str = "full"
     master_seed: int = 20260916
@@ -194,12 +181,6 @@ def _tuplify(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def profile_config(name: str, output_dir: Path | None = None) -> SyntheticExperimentConfig:
-    """Return a preregistered resource profile.
-
-    ``full`` follows the paper protocol. ``pilot`` preserves the factorial
-    logic with fewer repetitions. ``smoke`` is only for software validation
-    and must never be used for scientific conclusions.
-    """
 
     normalized = name.lower()
     base = SyntheticExperimentConfig(profile=normalized)
